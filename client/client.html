@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Client to test</title>
+	<link rel="stylesheet" href="client.css">
+	<script src="client.js"></script>
+</head>
+<body>
+	<div id="errorField">error Field</div>
+	<div id="responseField">response will be here</div>
+
+	<div class="grid_2_places">
+		<div>
+			<form name="auth">
+				<input type="text" class="input_text" name="mail" placeholder="mail">
+				<input type="password" class="input_text" name="pass" placeholder="password">
+			</form>
+			<input type="submit" class="input_submit" value="Авторизация" onclick="AuthUser()">
+			<!-- <input type="submit" class="input_submit" value="школа 21" onclick="oAuth42()"> -->
+			<form method="get" action="https://api.intra.42.fr/oauth/authorize">
+				<input type="hidden" name="client_id" value="96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53">
+				<input type="hidden" name="redirect_uri" value="http://localhost:4000/user/auth/oauth42">
+				<input type="hidden" name="scope" value="public">
+				<input type="hidden" name="state" value="bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d">
+				<input type="hidden" name="response_type" value="code">
+				<input type="submit" class="input_submit" value="школа 21">
+			</form>
+		</div>
+		<div>
+			<form name="reg">
+				<input type="text" class="input_text" name="mail" placeholder="mail">
+				<input type="text" class="input_text" name="displayname" placeholder="displayname">
+				<input type="text" class="input_text" name="first_name" placeholder="first name">
+				<input type="text" class="input_text" name="last_name" placeholder="last name">
+				<input type="password" class="input_text" name="pass" placeholder="password">
+			</form>
+			<input type="submit" class="input_submit" value="Регистрация" onclick="RegUser()">
+		</div>
+	</div>
+	
+</body>
+</html>
