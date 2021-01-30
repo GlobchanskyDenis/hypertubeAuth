@@ -70,7 +70,7 @@ func CreateUsersTable() *errors.Error {
 		"encryptedPass VARCHAR(35) DEFAULT NULL, " +
 		"first_name VARCHAR DEFAULT NULL, " +
 		"last_name VARCHAR DEFAULT NULL, " +
-		"displayname VARCHAR NOT NULL, " +
+		"username VARCHAR NOT NULL, " +
 		"is_email_confirmed BOOL NOT NULL DEFAULT false, " +
 		"email_confirm_hash VARCHAR NOT NULL DEFAULT '')"); err != nil {
 		return errors.DatabaseError.SetArgs("11", "11").SetOrigin(err)

@@ -18,11 +18,11 @@ func TestSetUserBasic(t *testing.T) {
 	user1.Fname = &fname
 	lname := "Globchansky"
 	user1.Lname = &lname
-	user1.Displayname = displayName
+	user1.Username = username
 	user1.EmailConfirmHash = emailConfirmHash
 	user2.Email = emailValid2
 	user2.EncryptedPass = &encryptedPass
-	user2.Displayname = displayName
+	user2.Username = username
 	user2.EmailConfirmHash = emailConfirmHash
 
 	initTest(t)
@@ -121,9 +121,9 @@ func TestSetUserBasic(t *testing.T) {
 				t_.Errorf("%sError: received users ImageBody differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.ImageBody, *newUser.ImageBody, logger.NO_COLOR)
 			}
-			if user1.Displayname != newUser.Displayname {
-				t_.Errorf("%sError: received users Displayname differs. Expected %s got %s%s", logger.RED_BG,
-					user1.Displayname, newUser.Displayname, logger.NO_COLOR)
+			if user1.Username != newUser.Username {
+				t_.Errorf("%sError: received users Username differs. Expected %s got %s%s", logger.RED_BG,
+					user1.Username, newUser.Username, logger.NO_COLOR)
 			}
 			if user1.EmailConfirmHash != newUser.EmailConfirmHash {
 				t_.Errorf("%sError: received users EmailConfirmHash differs. Expected %s got %s%s", logger.RED_BG,
@@ -207,9 +207,9 @@ func TestSetUserBasic(t *testing.T) {
 				t_.Errorf("%sError: received users ImageBody differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.ImageBody, *newUser.ImageBody, logger.NO_COLOR)
 			}
-			if user1.Displayname != newUser.Displayname {
-				t_.Errorf("%sError: received users Displayname differs. Expected %s got %s%s", logger.RED_BG,
-					user1.Displayname, newUser.Displayname, logger.NO_COLOR)
+			if user1.Username != newUser.Username {
+				t_.Errorf("%sError: received users Username differs. Expected %s got %s%s", logger.RED_BG,
+					user1.Username, newUser.Username, logger.NO_COLOR)
 			}
 			if user1.EmailConfirmHash != newUser.EmailConfirmHash {
 				t_.Errorf("%sError: received users EmailConfirmHash differs. Expected %s got %s%s", logger.RED_BG,

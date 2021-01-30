@@ -27,13 +27,13 @@ func UserSet42(user *model.User42) (*model.UserBasic, *errors.Error) {
 	**	Create new basic user
 	 */
 	stmt1, err := tx.Prepare(`INSERT INTO users (user_42_id, image_body, email, first_name, last_name,
-		displayname, is_email_confirmed) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING user_id`)
+		username, is_email_confirmed) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING user_id`)
 	if err != nil {
 		return nil, errors.DatabasePreparingError.SetOrigin(err)
 	}
 	defer stmt1.Close()
 	if err = stmt1.QueryRow(userBasic.User42Id, userBasic.ImageBody, userBasic.Email, userBasic.Fname, userBasic.Lname,
-		userBasic.Displayname, userBasic.IsEmailConfirmed).Scan(&userBasic.UserId); err != nil {
+		userBasic.Username, userBasic.IsEmailConfirmed).Scan(&userBasic.UserId); err != nil {
 		if strings.Contains(err.Error(), `users_email_key`) {
 			return nil, errors.ImpossibleToExecute.SetArgs("Эта почта уже закреплена за другим пользователем",
 				"This email is already assigned to another user")

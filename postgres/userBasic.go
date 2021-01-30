@@ -12,13 +12,13 @@ func UserSetBasic(user *model.UserBasic) *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	stmt, err := conn.db.Prepare(`INSERT INTO users (email, encryptedpass, displayname, email_confirm_hash)
+	stmt, err := conn.db.Prepare(`INSERT INTO users (email, encryptedpass, username, email_confirm_hash)
 		VALUES ($1, $2, $3, $4) RETURNING user_id`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
 	defer stmt.Close()
-	if err = stmt.QueryRow(user.Email, user.EncryptedPass, user.Displayname,
+	if err = stmt.QueryRow(user.Email, user.EncryptedPass, user.Username,
 		user.EmailConfirmHash).Scan(&user.UserId); err != nil {
 		if strings.Contains(err.Error(), `users_email_key`) {
 			return errors.ImpossibleToExecute.SetArgs("Эта почта уже закреплена за другим пользователем",
@@ -78,7 +78,7 @@ func UserGetBasicById(userId uint) (*model.UserBasic, *errors.Error) {
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Displayname, &user.IsEmailConfirmed, &user.EmailConfirmHash); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -104,7 +104,7 @@ func UserGetBasicByEmail(email string) (*model.UserBasic, *errors.Error) {
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Displayname, &user.IsEmailConfirmed, &user.EmailConfirmHash); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -168,11 +168,11 @@ func UserUpdateBasic(user *model.UserBasic) *errors.Error {
 		return Err
 	}
 	stmt, err := conn.db.Prepare(`UPDATE users SET image_body=$2, email=$3, first_name=$4,
-		last_name=$5, displayname=$6 WHERE user_id = $1`)
+		last_name=$5, username=$6 WHERE user_id = $1`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
-	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Email, user.Fname, user.Lname, user.Displayname)
+	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Email, user.Fname, user.Lname, user.Username)
 	if err != nil {
 		return errors.DatabaseExecutingError.SetOrigin(err)
 	}

@@ -45,7 +45,7 @@ MIME-Version: 1.0
 Content-type: text/html; charset=utf8
 
 <html><head></head><body>
-<span style="font-size: 1.3em; color: green;">Hello, ` + user.Displayname + `, click below to confirm your email
+<span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm your email
 <form method="POST" action="http://localhost:`+portString+`/user/update/status/">
 	<input type="hidden" name="x-reg-token" value="`+user.EmailConfirmHash+`">
 	<input type="submit" value="Click to confirm mail">

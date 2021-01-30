@@ -1,6 +1,7 @@
 package model
 
 import (
+	"HypertubeAuth/controller/validator"
 	"HypertubeAuth/errors"
 	"time"
 )
@@ -13,7 +14,7 @@ type UserBasicModel struct {
 	EncryptedPass    *string `json:"-"`
 	Fname            *string `json:"first_name"`
 	Lname            *string `json:"last_name"`
-	Displayname      string  `json:"displayname"`
+	Username         string  `json:"username"`
 	IsEmailConfirmed bool    `json:"-"`
 	EmailConfirmHash string  `json:"-"`
 }
@@ -53,6 +54,15 @@ func (user UserBasic) Validate() *errors.Error {
 	if user.Email == "" || user.Passwd == "" {
 		return errors.NoArgument.SetArgs("Email или пароль отсутствуют", "Email or password expected")
 	}
+	if Err := validator.ValidateEmail(user.Email); Err != nil {
+		return Err
+	}
+	if Err := validator.ValidatePassword(user.Passwd); Err != nil {
+		return Err
+	}
+	if Err := validator.ValidateName(user.Username); Err != nil {
+		return Err
+	}
 	return nil
 }
 
@@ -66,6 +76,6 @@ func (user *UserBasic) ExtractFromUser42(user42 *User42) {
 	user.Email = user42.Email
 	user.Fname = &user42.Fname
 	user.Lname = &user42.Lname
-	user.Displayname = user42.Displayname
+	user.Username = user42.Displayname
 	user.IsEmailConfirmed = true
 }

@@ -11,7 +11,7 @@ var (
 	emailValid1      = "user1@gmail.com"
 	emailValid2      = "user2@gmail.com"
 	encryptedPass    = "WQEsafqwesa="
-	displayName      = "USER"
+	username         = "USER"
 	emailConfirmHash = "emailConfirmHash"
 )
 

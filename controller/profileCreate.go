@@ -63,8 +63,15 @@ func profileCreate(w http.ResponseWriter, r *http.Request) {
 				logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно отправлено")
 		}
 	}(user, conf.ServerPort)
+
+	userJson, err := json.Marshal(user)
+	if err != nil {
+		logger.Error(r, errors.MarshalError.SetOrigin(Err))
+		errorResponse(w, errors.MarshalError)
+		return
+	}
 	
-	successResponse(w, nil)
+	successResponse(w, userJson)
 	logger.Success(r, "Пользователь #" + logger.BLUE + strconv.Itoa(int(user.UserId)) + logger.NO_COLOR + " успешно создан" )
 }
 
