@@ -111,8 +111,8 @@ func ValidateEmail(email string) *errors.Error {
 
 	if buf[0] == '_' || buf[0] == '-' || buf[0] == '@' ||
 		buf[0] == '.' || (buf[0] >= '0' && buf[0] <= '9') {
-			return errors.InvalidArgument.SetArgs("первый символ почтового адреса невалиден",
-				"invalid first mail address symbol")
+		return errors.InvalidArgument.SetArgs("первый символ почтового адреса невалиден",
+			"invalid first mail address symbol")
 	}
 
 	if buf[length-1] == '_' || buf[length-1] == '-' || buf[length-1] == '@' ||
@@ -159,4 +159,3 @@ func ValidateName(name string) *errors.Error {
 	}
 	return nil
 }
-

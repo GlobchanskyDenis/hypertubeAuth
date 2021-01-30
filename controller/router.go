@@ -31,7 +31,13 @@ func Router() http.Handler {
 	// PUT
 	mux.Handle("/api/profile/create", corsPut(http.HandlerFunc(profileCreate)))
 
-	// email confirm
+	// /email/patch
+	// /email/confirm
+	// /email/resend
+	// /passwd/repair
+	// /passwd/patch
+	// /profile/patch
+	// /profile/delete
 
 	serveMux := panicRecover(mux)
 

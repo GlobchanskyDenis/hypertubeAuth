@@ -78,7 +78,7 @@ func UserSet42(user *model.User42) (*model.UserBasic, *errors.Error) {
 }
 
 // func UserDelete42(user *model.User42) *errors.Error {
-// 	if 
+// 	if
 // 	conn, Err := getConnection()
 // 	if Err != nil {
 // 		return Err

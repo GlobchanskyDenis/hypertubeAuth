@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"HypertubeAuth/configurator"
 	"HypertubeAuth/controller/hash"
 	"HypertubeAuth/controller/mailer"
-	"HypertubeAuth/configurator"
-	"HypertubeAuth/logger"
 	"HypertubeAuth/errors"
+	"HypertubeAuth/logger"
 	"HypertubeAuth/postgres"
 	"testing"
 )

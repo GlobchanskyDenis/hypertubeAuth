@@ -8,7 +8,7 @@ import (
 
 type UserBasicModel struct {
 	UserId           uint    `json:"user_id"`
-	User42Id		 *uint	 `json:"-"`
+	User42Id         *uint   `json:"-"`
 	ImageBody        *string `json:"image_body"`
 	Email            string  `json:"email"`
 	EncryptedPass    *string `json:"-"`
@@ -21,12 +21,12 @@ type UserBasicModel struct {
 
 type UserBasic struct {
 	UserBasicModel
-	Passwd      string `json:"-"`
+	Passwd string `json:"-"`
 }
 
 type User42Model struct {
-	User42Id      uint      `json:"-"`
-	UserId		  uint		`json:"-"`
+	User42Id     uint       `json:"-"`
+	UserId       uint       `json:"-"`
 	AccessToken  *string    `json:"-"`
 	RefreshToken *string    `json:"-"`
 	ExpiresAt    *time.Time `json:"-"`
@@ -42,12 +42,12 @@ type User42 struct {
 }
 
 type TokenHeader struct {
-	UserId      uint   `json:"user_id"`
+	UserId uint `json:"user_id"`
 }
 
 type Token struct {
-	ServerPasswd string 	`json:"server_passwd,omitempty"`
-	AccessToken  string 	`json:"access_token"`
+	ServerPasswd string `json:"server_passwd,omitempty"`
+	AccessToken  string `json:"access_token"`
 }
 
 func (user UserBasic) Validate() *errors.Error {

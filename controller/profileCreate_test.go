@@ -2,16 +2,16 @@ package controller
 
 import (
 	"HypertubeAuth/errors"
+	"HypertubeAuth/logger"
 	"HypertubeAuth/model"
 	"HypertubeAuth/postgres"
-	"HypertubeAuth/logger"
+	"bytes"
 	"encoding/json"
-	"testing"
-	"net/http/httptest"
 	"io"
 	"net/http"
-	"bytes"
+	"net/http/httptest"
 	"strconv"
+	"testing"
 )
 
 func TestProfileCreate(t *testing.T) {
@@ -39,32 +39,32 @@ func TestProfileCreate(t *testing.T) {
 		{
 			name: "invalid mail",
 			payload: map[string]interface{}{
-				"email": "email",
-				"passwd": "passWD123@",
+				"email":    "email",
+				"passwd":   "passWD123@",
 				"username": "user",
 			},
 			expectedStatus: errors.InvalidArgument.GetHttpStatus(),
 		}, {
 			name: "invalid password",
 			payload: map[string]interface{}{
-				"email": "email@gmail.com",
-				"passwd": "pass",
+				"email":    "email@gmail.com",
+				"passwd":   "pass",
 				"username": "user",
 			},
 			expectedStatus: errors.InvalidArgument.GetHttpStatus(),
 		}, {
 			name: "invalid displayname",
 			payload: map[string]interface{}{
-				"email": "email@gmail.com",
-				"passwd": "passWD123@",
+				"email":    "email@gmail.com",
+				"passwd":   "passWD123@",
 				"username": "",
 			},
 			expectedStatus: errors.InvalidArgument.GetHttpStatus(),
 		}, {
 			name: "valid",
 			payload: map[string]interface{}{
-				"email": "email@gmail.com",
-				"passwd": "passWD123@",
+				"email":    "email@gmail.com",
+				"passwd":   "passWD123@",
 				"username": "user",
 			},
 			expectedStatus: http.StatusOK,
@@ -84,13 +84,13 @@ func TestProfileCreate(t *testing.T) {
 				t_.Errorf("%sError: cannot marshal test case payload - %s%s", logger.RED_BG, err.Error(), logger.NO_COLOR)
 				t_.FailNow()
 			}
-			
+
 			// tc.requestBody = bytes.NewBufferString(tc.payload)
 			req = httptest.NewRequest("PUT", url, bytes.NewBufferString(string(payloadJson)))
 
 			/*
 			**	start test
-			*/
+			 */
 			profileCreate(rec, req)
 			if rec.Code != tc.expectedStatus {
 				t_.Errorf("%sERROR: wrong StatusCode: got %d, expected %d%s", logger.RED_BG,

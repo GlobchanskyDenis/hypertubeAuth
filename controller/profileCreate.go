@@ -14,7 +14,7 @@ import (
 
 /*
 **	/api/profile/create
-*/
+ */
 
 func profileCreate(w http.ResponseWriter, r *http.Request) {
 	user, Err := parseUserBasicFromRequest(r)
@@ -70,9 +70,9 @@ func profileCreate(w http.ResponseWriter, r *http.Request) {
 		errorResponse(w, errors.MarshalError)
 		return
 	}
-	
+
 	successResponse(w, userJson)
-	logger.Success(r, "Пользователь #" + logger.BLUE + strconv.Itoa(int(user.UserId)) + logger.NO_COLOR + " успешно создан" )
+	logger.Success(r, "Пользователь #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно создан")
 }
 
 func parseUserBasicFromRequest(r *http.Request) (*model.UserBasic, *errors.Error) {
@@ -84,7 +84,7 @@ func parseUserBasicFromRequest(r *http.Request) (*model.UserBasic, *errors.Error
 	if err := json.NewDecoder(r.Body).Decode(&requestUser); err != nil {
 		return nil, errors.InvalidRequestBody.SetOrigin(err)
 	}
-	var user = &model.UserBasic{UserBasicModel:requestUser.UserBasicModel}
+	var user = &model.UserBasic{UserBasicModel: requestUser.UserBasicModel}
 	user.Passwd = requestUser.Passwd
 	return user, nil
 }

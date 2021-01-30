@@ -3,15 +3,15 @@ package hash
 import (
 	"HypertubeAuth/errors"
 	"HypertubeAuth/model"
-	"hash/crc32"
-	"strings"
-	"strconv"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/json"
 	"encoding/base64"
+	"encoding/json"
+	"hash/crc32"
 	"io"
+	"strconv"
+	"strings"
 	// "fmt"
 )
 
@@ -101,7 +101,7 @@ func CheckTokenBase64Signature(accessTokenBase64 string) *errors.Error {
 	}
 	tokenParts := strings.Split(string(decodedAccessToken), ".")
 	if len(tokenParts) != 2 {
-		return errors.InvalidToken.SetHidden("Токен должен состоять из 2 частей - но содержит "+strconv.Itoa(len(tokenParts)))
+		return errors.InvalidToken.SetHidden("Токен должен состоять из 2 частей - но содержит " + strconv.Itoa(len(tokenParts)))
 	}
 	signature, Err := CreateTokenSignature(tokenParts[0])
 	if Err != nil {
@@ -133,7 +133,7 @@ func GetHeaderFromToken(accessTokenBase64 string) (model.TokenHeader, *errors.Er
 	}
 	tokenParts := strings.Split(string(decodedAccessToken), ".")
 	if len(tokenParts) != 2 {
-		return header, errors.InvalidToken.SetHidden("Токен должен состоять из 2 частей - но содержит "+strconv.Itoa(len(tokenParts)))
+		return header, errors.InvalidToken.SetHidden("Токен должен состоять из 2 частей - но содержит " + strconv.Itoa(len(tokenParts)))
 	}
 
 	if Err := CheckTokenPartsSignature(tokenParts[0], tokenParts[1]); Err != nil {

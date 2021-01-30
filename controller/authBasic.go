@@ -13,7 +13,7 @@ import (
 
 /*
 **	/api/auth/basic
-*/
+ */
 
 func authBasic(w http.ResponseWriter, r *http.Request) {
 	email, passwd, ok := r.BasicAuth()
@@ -32,13 +32,19 @@ func authBasic(w http.ResponseWriter, r *http.Request) {
 
 	encryptedPass, Err := hash.PasswdHash(passwd)
 	if Err != nil {
-		logger.Warning(r, "cannot get password hash - " + Err.Error())
+		logger.Warning(r, "cannot get password hash - "+Err.Error())
 		errorResponse(w, Err)
 		return
 	}
 
-	if user.EncryptedPass == nil || encryptedPass == nil || *user.EncryptedPass != *encryptedPass {
+	if user.EncryptedPass == nil || encryptedPass == nil {
 		logger.Warning(r, "authenticaion failed - password missmatch")
+		errorResponse(w, errors.AuthFail)
+		return
+	}
+
+	if *user.EncryptedPass != *encryptedPass {
+		logger.Warning(r, "authenticaion failed - password missmatch. Expected "+*user.EncryptedPass+" got "+*encryptedPass)
 		errorResponse(w, errors.AuthFail)
 		return
 	}
@@ -51,12 +57,12 @@ func authBasic(w http.ResponseWriter, r *http.Request) {
 
 	accessToken, Err := hash.CreateToken(user)
 	if Err != nil {
-		logger.Warning(r, "cannot get password hash - " + Err.Error())
+		logger.Warning(r, "cannot get password hash - "+Err.Error())
 		errorResponse(w, Err)
 		return
 	}
 
-	var responseToken = model.Token{ AccessToken: accessToken }
+	var responseToken = model.Token{AccessToken: accessToken}
 
 	responseJson, err := json.Marshal(responseToken)
 	if err != nil {
@@ -66,5 +72,5 @@ func authBasic(w http.ResponseWriter, r *http.Request) {
 	}
 
 	successResponse(w, responseJson)
-	logger.Success(r, "user #" + strconv.Itoa(int(user.UserId)) + " was authenticated")
+	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was authenticated")
 }

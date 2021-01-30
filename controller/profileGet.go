@@ -13,7 +13,7 @@ import (
 func profileGet(w http.ResponseWriter, r *http.Request) {
 	/*
 	**	Получаю токен из заголовка
-	*/
+	 */
 	accessToken := r.Header.Get("access_token")
 	if accessToken == "" {
 		logger.Error(r, errors.UserNotLogged.SetArgs("отсутствует токен доступа", "access token expected"))
@@ -51,7 +51,7 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 
 	/*
 	**	Если пользователь не мой - почистить приватные поля
-	*/
+	 */
 	if user.UserId != header.UserId {
 		user.Sanitize()
 	}
@@ -64,5 +64,5 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	successResponse(w, jsonUser)
-	logger.Success(r, "user #" + strconv.Itoa(int(user.UserId)) + " was checked")
+	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was checked")
 }

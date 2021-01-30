@@ -6,15 +6,14 @@ import (
 	"HypertubeAuth/logger"
 	"HypertubeAuth/model"
 	"HypertubeAuth/postgres"
-	"io/ioutil"
 	"encoding/json"
-	"strconv"
+	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
-	"net"
+	"strconv"
 	"time"
 	// "fmt"
-	
 )
 
 type requestParams struct {
@@ -44,7 +43,7 @@ type profile42 struct {
 
 /*
 **	/api/auth/oauth42
-*/
+ */
 func authOauth42(w http.ResponseWriter, r *http.Request) {
 	params, Err := parseRequestParams42(r)
 	if Err != nil {
@@ -54,7 +53,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	}
 	/*
 	**	Getging intra42 api token
-	*/
+	 */
 	token, Err := getTokenFrom42(params)
 	if Err != nil {
 		logger.Error(r, Err)
@@ -63,7 +62,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	}
 	/*
 	**	Getting user profile from intra api and fills it into *model.User42
-	*/
+	 */
 	user, Err := getUser42(token)
 	if Err != nil {
 		logger.Error(r, Err)
@@ -74,11 +73,11 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	var userBasic *model.UserBasic
 	/*
 	**	getting user from db if it exists
-	*/
+	 */
 	userFromDb, Err := postgres.UserGet42ById(user.UserId)
 	if Err != nil {
 		if !errors.UserNotExist.IsOverlapWithError(Err) {
-			// user 
+			// user
 			logger.Error(r, Err.SetArgs("1", "1"))
 			errorResponse(w, Err)
 			return
@@ -107,7 +106,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 
 	accessToken, Err := hash.CreateToken(userBasic)
 	if Err != nil {
-		logger.Warning(r, "cannot get password hash - " + Err.Error())
+		logger.Warning(r, "cannot get password hash - "+Err.Error())
 		errorResponse(w, Err)
 		return
 	}
@@ -119,8 +118,8 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Success(r, "user #" + strconv.Itoa(int(user.UserId)) + " was authenticated")
-	cookie := &http.Cookie{ Name: "access_token", Value: accessToken}
+	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was authenticated")
+	cookie := &http.Cookie{Name: "access_token", Value: accessToken}
 
 	http.SetCookie(w, cookie)
 	w.Header().Add("access_token", accessToken)
@@ -131,7 +130,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 
 /*
 **	Parsing GET params from request
-*/
+ */
 func parseRequestParams42(r *http.Request) (requestParams, *errors.Error) {
 	var params requestParams
 
@@ -153,7 +152,7 @@ func parseRequestParams42(r *http.Request) (requestParams, *errors.Error) {
 
 /*
 **	Request to ecole 42 server API for token
-*/
+ */
 func getTokenFrom42(params requestParams) (token42, *errors.Error) {
 	var result token42
 
@@ -164,13 +163,13 @@ func getTokenFrom42(params requestParams) (token42, *errors.Error) {
 	portString := strconv.FormatUint(uint64(conf.ServerPort), 10)
 
 	formData := url.Values{
-		"client_id": {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53",},
-		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d",},
-		"code": {params.Code,},
-		"state": {params.State,},
+		"client_id":     {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"},
+		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"},
+		"code":          {params.Code},
+		"state":         {params.State},
 		// "redirect_uri": {"file:///home/skinny/Documents/go/src/HypertubeAuth/client/client.html",},
-		"redirect_uri": {"http://localhost:"+portString+"/user/auth/oauth42",},
-		"grant_type": {"authorization_code",},
+		"redirect_uri": {"http://localhost:" + portString + "/user/auth/oauth42"},
+		"grant_type":   {"authorization_code"},
 	}
 	resp, err := http.PostForm("https://api.intra.42.fr/oauth/token", formData)
 	if err != nil {
@@ -203,11 +202,11 @@ func refreshTokenFrom42(refreshToken string) (token42, *errors.Error) {
 	portString := strconv.FormatUint(uint64(conf.ServerPort), 10)
 
 	formData := url.Values{
-		"client_id": {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53",},
-		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d",},
-		"refresh_token": {refreshToken,},
-		"redirect_uri": {"http://localhost:"+portString+"/user/auth/oauth42",},
-		"grant_type": {"refresh_token",},
+		"client_id":     {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"},
+		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"},
+		"refresh_token": {refreshToken},
+		"redirect_uri":  {"http://localhost:" + portString + "/user/auth/oauth42"},
+		"grant_type":    {"refresh_token"},
 	}
 	resp, err := http.PostForm("https://api.intra.42.fr/oauth/token", formData)
 	if err != nil {
@@ -228,22 +227,22 @@ func refreshTokenFrom42(refreshToken string) (token42, *errors.Error) {
 
 /*
 **	Request to ecole 42 server API for user profile
-*/
+ */
 func getUserProfile(accessToken string) (profile42, *errors.Error) {
 	var profile profile42
 	transport := &http.Transport{
 		DialContext: (&net.Dialer{
-			Timeout: 30 * time.Second,
+			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 			DualStack: true,
 		}).DialContext,
-			MaxIdleConns: 100,
-			IdleConnTimeout: 90 * time.Second,
-			TLSHandshakeTimeout: 10 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 	}
 	client := &http.Client{
-		Timeout: time.Second * 10,
+		Timeout:   time.Second * 10,
 		Transport: transport,
 	}
 	url := "https://api.intra.42.fr/v2/me"
@@ -270,24 +269,24 @@ func getUserProfile(accessToken string) (profile42, *errors.Error) {
 
 /*
 **	Forming User42 structure
-*/
+ */
 func getUser42(token token42) (*model.User42, *errors.Error) {
 	profile, Err := getUserProfile(token.AccessToken)
 	if Err != nil {
-		return nil, Err 
+		return nil, Err
 	}
 
 	return &model.User42{
-		Email: profile.Email,
-		Fname: profile.Fname,
-		Lname: profile.Lname,
+		Email:       profile.Email,
+		Fname:       profile.Fname,
+		Lname:       profile.Lname,
 		Displayname: profile.Displayname,
-		ImageBody: profile.ImageBody,
+		ImageBody:   profile.ImageBody,
 		User42Model: model.User42Model{
-			UserId: profile.UserId,
-			AccessToken: &token.AccessToken,
+			UserId:       profile.UserId,
+			AccessToken:  &token.AccessToken,
 			RefreshToken: &token.RefreshToken,
-			ExpiresAt: &token.ExpiresAt,
+			ExpiresAt:    &token.ExpiresAt,
 		},
 	}, nil
 }

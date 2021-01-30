@@ -10,28 +10,28 @@ import (
 
 func TestHash(t *testing.T) {
 	if Err := Init("../../conf.json"); Err != nil {
-		t.Errorf("%sError during initialize package - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
+		t.Errorf("%sError during initialize package - %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		t.FailNow()
 	}
 
-	t.Run("check for correct signature", func(t_ *testing.T){
+	t.Run("check for correct signature", func(t_ *testing.T) {
 		var user = &model.UserBasic{}
 		user.UserId = 42
 		user.Email = "school21@gmail.com"
 		accessToken, Err := CreateToken(user)
 		if Err != nil {
-			t_.Errorf("%sError during creating token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
+			t_.Errorf("%sError during creating token - %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
 
 		if Err = CheckTokenBase64Signature(accessToken); Err != nil {
-			t_.Errorf("%sError cannot unmarshal token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
+			t_.Errorf("%sError cannot unmarshal token - %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
 		t_.Logf("%sSuccess: token is valid%s", logger.GREEN_BG, logger.NO_COLOR)
 	})
 
-	t.Run("check token header data validity", func(t_ *testing.T){
+	t.Run("check token header data validity", func(t_ *testing.T) {
 		var user = &model.UserBasic{}
 		user.UserId = 42
 		user.Email = "school21@gmail.com"
@@ -44,18 +44,18 @@ func TestHash(t *testing.T) {
 		user.Lname = &lname
 		accessToken, Err := CreateToken(user)
 		if Err != nil {
-			t_.Errorf("%sError during creating token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
+			t_.Errorf("%sError during creating token - %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
 
 		header, Err := GetHeaderFromToken(accessToken)
 		if Err != nil {
-			t_.Errorf("%sError cannot unmarshal token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
+			t_.Errorf("%sError cannot unmarshal token - %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
 
 		if header.UserId != user.UserId {
-			t_.Errorf("%sError: UserId are incorrect after decoding. Expected %d Got %d%s" , logger.RED_BG,
+			t_.Errorf("%sError: UserId are incorrect after decoding. Expected %d Got %d%s", logger.RED_BG,
 				user.UserId, header.UserId, logger.NO_COLOR)
 		}
 
@@ -63,7 +63,7 @@ func TestHash(t *testing.T) {
 			t_.Logf("%sSuccess: token is valid%s", logger.GREEN_BG, logger.NO_COLOR)
 		}
 	})
-	
+
 }
 
 func Init(configFileName string) *errors.Error {
@@ -95,4 +95,4 @@ func Init(configFileName string) *errors.Error {
 	}
 	println(logger.GREEN + "успешно" + logger.NO_COLOR)
 	return nil
-} 
+}

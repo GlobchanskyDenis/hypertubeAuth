@@ -90,34 +90,34 @@ func TestSetUserBasic(t *testing.T) {
 			}
 			if (user1.EncryptedPass != nil && newUser.EncryptedPass == nil) ||
 				(user1.EncryptedPass == nil && newUser.EncryptedPass != nil) {
-					t_.Errorf("%sError: received users EncryptedPass differs. Expected %#v got %#v%s", logger.RED_BG,
+				t_.Errorf("%sError: received users EncryptedPass differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.EncryptedPass, newUser.EncryptedPass, logger.NO_COLOR)
-			} else if (user1.EncryptedPass != nil && newUser.EncryptedPass != nil &&
-			*user1.EncryptedPass != *newUser.EncryptedPass) {
+			} else if user1.EncryptedPass != nil && newUser.EncryptedPass != nil &&
+				*user1.EncryptedPass != *newUser.EncryptedPass {
 				t_.Errorf("%sError: received users EncryptedPass differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.EncryptedPass, *newUser.EncryptedPass, logger.NO_COLOR)
 			}
 			if (user1.Fname != nil && newUser.Fname == nil) ||
 				(user1.Fname == nil && newUser.Fname != nil) {
-					t_.Errorf("%sError: received users Fname differs. Expected %#v got %#v%s", logger.RED_BG,
+				t_.Errorf("%sError: received users Fname differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.Fname, newUser.Fname, logger.NO_COLOR)
-			} else if (user1.Fname != nil && newUser.Fname != nil && *user1.Fname != *newUser.Fname) {
+			} else if user1.Fname != nil && newUser.Fname != nil && *user1.Fname != *newUser.Fname {
 				t_.Errorf("%sError: received users Fname differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.Fname, *newUser.Fname, logger.NO_COLOR)
 			}
 			if (user1.Lname != nil && newUser.Lname == nil) ||
 				(user1.Lname == nil && newUser.Lname != nil) {
-					t_.Errorf("%sError: received users Lname differs. Expected %#v got %#v%s", logger.RED_BG,
+				t_.Errorf("%sError: received users Lname differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.Lname, newUser.Lname, logger.NO_COLOR)
-			} else if (user1.Lname != nil && newUser.Lname != nil && *user1.Lname != *newUser.Lname) {
+			} else if user1.Lname != nil && newUser.Lname != nil && *user1.Lname != *newUser.Lname {
 				t_.Errorf("%sError: received users Lname differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.Lname, *newUser.Lname, logger.NO_COLOR)
 			}
 			if (user1.ImageBody != nil && newUser.ImageBody == nil) ||
-			(user1.ImageBody == nil && newUser.ImageBody != nil) {
-					t_.Errorf("%sError: received users ImageBody differs. Expected %#v got %#v%s", logger.RED_BG,
+				(user1.ImageBody == nil && newUser.ImageBody != nil) {
+				t_.Errorf("%sError: received users ImageBody differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.ImageBody, newUser.ImageBody, logger.NO_COLOR)
-			} else if (user1.ImageBody != nil && newUser.ImageBody != nil && *user1.ImageBody != *newUser.ImageBody) {
+			} else if user1.ImageBody != nil && newUser.ImageBody != nil && *user1.ImageBody != *newUser.ImageBody {
 				t_.Errorf("%sError: received users ImageBody differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.ImageBody, *newUser.ImageBody, logger.NO_COLOR)
 			}
@@ -130,7 +130,7 @@ func TestSetUserBasic(t *testing.T) {
 					user1.EmailConfirmHash, newUser.EmailConfirmHash, logger.NO_COLOR)
 			}
 		}
-		if !t_.Failed(){
+		if !t_.Failed() {
 			t_.Logf("%sSuccess: user was received successfully%s", logger.GREEN_BG, logger.NO_COLOR)
 		}
 	})
@@ -176,34 +176,34 @@ func TestSetUserBasic(t *testing.T) {
 			}
 			if (user1.EncryptedPass != nil && newUser.EncryptedPass == nil) ||
 				(user1.EncryptedPass == nil && newUser.EncryptedPass != nil) {
-					t_.Errorf("%sError: received users EncryptedPass differs. Expected %#v got %#v%s", logger.RED_BG,
+				t_.Errorf("%sError: received users EncryptedPass differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.EncryptedPass, newUser.EncryptedPass, logger.NO_COLOR)
-			} else if (user1.EncryptedPass != nil && newUser.EncryptedPass != nil &&
-			*user1.EncryptedPass != *newUser.EncryptedPass) {
+			} else if user1.EncryptedPass != nil && newUser.EncryptedPass != nil &&
+				*user1.EncryptedPass != *newUser.EncryptedPass {
 				t_.Errorf("%sError: received users EncryptedPass differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.EncryptedPass, *newUser.EncryptedPass, logger.NO_COLOR)
 			}
 			if (user1.Fname != nil && newUser.Fname == nil) ||
 				(user1.Fname == nil && newUser.Fname != nil) {
-					t_.Errorf("%sError: received users Fname differs. Expected %#v got %#v%s", logger.RED_BG,
+				t_.Errorf("%sError: received users Fname differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.Fname, newUser.Fname, logger.NO_COLOR)
-			} else if (user1.Fname != nil && newUser.Fname != nil && *user1.Fname != *newUser.Fname) {
+			} else if user1.Fname != nil && newUser.Fname != nil && *user1.Fname != *newUser.Fname {
 				t_.Errorf("%sError: received users Fname differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.Fname, *newUser.Fname, logger.NO_COLOR)
 			}
 			if (user1.Lname != nil && newUser.Lname == nil) ||
 				(user1.Lname == nil && newUser.Lname != nil) {
-					t_.Errorf("%sError: received users Lname differs. Expected %#v got %#v%s", logger.RED_BG,
+				t_.Errorf("%sError: received users Lname differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.Lname, newUser.Lname, logger.NO_COLOR)
-			} else if (user1.Lname != nil && newUser.Lname != nil && *user1.Lname != *newUser.Lname) {
+			} else if user1.Lname != nil && newUser.Lname != nil && *user1.Lname != *newUser.Lname {
 				t_.Errorf("%sError: received users Lname differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.Lname, *newUser.Lname, logger.NO_COLOR)
 			}
 			if (user1.ImageBody != nil && newUser.ImageBody == nil) ||
-			(user1.ImageBody == nil && newUser.ImageBody != nil) {
-					t_.Errorf("%sError: received users ImageBody differs. Expected %#v got %#v%s", logger.RED_BG,
+				(user1.ImageBody == nil && newUser.ImageBody != nil) {
+				t_.Errorf("%sError: received users ImageBody differs. Expected %#v got %#v%s", logger.RED_BG,
 					user1.ImageBody, newUser.ImageBody, logger.NO_COLOR)
-			} else if (user1.ImageBody != nil && newUser.ImageBody != nil && *user1.ImageBody != *newUser.ImageBody) {
+			} else if user1.ImageBody != nil && newUser.ImageBody != nil && *user1.ImageBody != *newUser.ImageBody {
 				t_.Errorf("%sError: received users ImageBody differs. Expected %s got %s%s", logger.RED_BG,
 					*user1.ImageBody, *newUser.ImageBody, logger.NO_COLOR)
 			}
@@ -216,7 +216,7 @@ func TestSetUserBasic(t *testing.T) {
 					user1.EmailConfirmHash, newUser.EmailConfirmHash, logger.NO_COLOR)
 			}
 		}
-		if !t_.Failed(){
+		if !t_.Failed() {
 			t_.Logf("%sSuccess: user was received successfully%s", logger.GREEN_BG, logger.NO_COLOR)
 		}
 	})

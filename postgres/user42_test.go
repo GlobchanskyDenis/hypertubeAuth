@@ -11,8 +11,8 @@ import (
 
 func TestSetUser42(t *testing.T) {
 	var (
-		user1 = &model.User42{}
-		user2 = &model.User42{}
+		user1      = &model.User42{}
+		user2      = &model.User42{}
 		userBasic1 *model.UserBasic
 		userBasic2 *model.UserBasic
 	)
@@ -100,9 +100,9 @@ func TestSetUser42(t *testing.T) {
 		newUser, Err := UserGet42ById(user1.UserId)
 		if Err != nil {
 			t_.Errorf("%sError: %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
-		} else if user1.UserId != newUser.UserId || newUser.AccessToken == nil || 
-		newUser.RefreshToken == nil || newUser.ExpiresAt == nil || *user1.AccessToken != *newUser.AccessToken ||
-		*user1.RefreshToken != *newUser.RefreshToken || user1.ExpiresAt.Format(time.StampMilli) != newUser.ExpiresAt.Format(time.StampMilli) {
+		} else if user1.UserId != newUser.UserId || newUser.AccessToken == nil ||
+			newUser.RefreshToken == nil || newUser.ExpiresAt == nil || *user1.AccessToken != *newUser.AccessToken ||
+			*user1.RefreshToken != *newUser.RefreshToken || user1.ExpiresAt.Format(time.StampMilli) != newUser.ExpiresAt.Format(time.StampMilli) {
 			t_.Errorf("%sError: received user differs from original%s\nexpected %#v\ngot %#v", logger.RED_BG, logger.NO_COLOR,
 				user1.User42Model, newUser.User42Model)
 			t_.Errorf("%s\n%s", user1.ExpiresAt.Format(time.StampMilli), newUser.ExpiresAt.Format(time.StampMilli))
