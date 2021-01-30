@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func tokenCheck(w http.ResponseWriter, r *http.Request) {
+func authCheck(w http.ResponseWriter, r *http.Request) {
 	var token model.Token
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
 		logger.Warning(r, errors.InvalidRequestBody.SetOrigin(err).Error())

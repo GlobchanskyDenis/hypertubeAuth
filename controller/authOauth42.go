@@ -43,88 +43,96 @@ type profile42 struct {
 }
 
 /*
-**	Endpoint function
+**	/api/auth/oauth42
 */
-func userAuthOauth42(w http.ResponseWriter, r *http.Request) {
-	params, Err := parseRequestParams(r)
+func authOauth42(w http.ResponseWriter, r *http.Request) {
+	params, Err := parseRequestParams42(r)
 	if Err != nil {
 		logger.Warning(r, Err.Error())
 		errorResponse(w, Err)
 		return
 	}
+	/*
+	**	Getging intra42 api token
+	*/
 	token, Err := getTokenFrom42(params)
 	if Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)
 		return
 	}
+	/*
+	**	Getting user profile from intra api and fills it into *model.User42
+	*/
 	user, Err := getUser42(token)
 	if Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)
 		return
 	}
-	// fmt.Printf("%#v\n", user)
-	_, Err = postgres.UserGet42ById(user.UserId)
-	if Err != nil && !errors.UserNotExist.IsOverlapWithError(Err) {
-		logger.Error(r, Err.SetArgs("1", "1"))
-		errorResponse(w, Err)
-		return
-	}
-	if Err != nil && errors.UserNotExist.IsOverlapWithError(Err) {
-		if Err = postgres.UserSet42(user); Err != nil {
-			logger.Error(r, Err.SetArgs("2", "2"))
+
+	var userBasic *model.UserBasic
+	/*
+	**	getting user from db if it exists
+	*/
+	userFromDb, Err := postgres.UserGet42ById(user.UserId)
+	if Err != nil {
+		if !errors.UserNotExist.IsOverlapWithError(Err) {
+			// user 
+			logger.Error(r, Err.SetArgs("1", "1"))
 			errorResponse(w, Err)
 			return
+		} else {
+			logger.Log(r, "User42 with user42Id "+strconv.Itoa(int(user.User42Id))+" not found in database. Creating new one")
+			if userBasic, Err = postgres.UserSet42(user); Err != nil {
+				logger.Error(r, Err.SetArgs("2", "2"))
+				errorResponse(w, Err)
+				return
+			}
 		}
 	} else {
+		user.UserId = userFromDb.UserId
 		if Err = postgres.UserUpdate42(user); Err != nil {
 			logger.Error(r, Err.SetArgs("3", "3"))
 			errorResponse(w, Err)
 			return
 		}
+		userBasic, Err = postgres.UserGetBasicById(user.UserId)
+		if Err = postgres.UserUpdate42(user); Err != nil {
+			logger.Error(r, Err.SetArgs("4", "4"))
+			errorResponse(w, Err)
+			return
+		}
 	}
 
-	// tokenRaw, Err := hash.CreateToken(user.TransformToUser(), "user_42_strategy")
-	// if Err != nil {
-	// 	logger.Warning(r, "cannot get password hash - " + Err.Error())
-	// 	errorResponse(w, Err)
-	// 	return
-	// }
-
-	accessTokenRaw, Err := hash.CreateAccessTokenBase64(user.TransformToUser(), "user_42_strategy")
+	accessToken, Err := hash.CreateToken(userBasic)
 	if Err != nil {
-		logger.Warning(r, "cannot create access token - " + Err.Error())
+		logger.Warning(r, "cannot get password hash - " + Err.Error())
 		errorResponse(w, Err)
 		return
 	}
 
-	// successResponse(w, tokenRaw)
+	conf, Err := getConfig()
+	if Err != nil {
+		logger.Error(r, Err)
+		errorResponse(w, Err)
+		return
+	}
+
 	logger.Success(r, "user #" + strconv.Itoa(int(user.UserId)) + " was authenticated")
-	cookie := &http.Cookie{ Name: "tokenRaw", Value: accessTokenRaw}
-	// 	"/",
-	// 	"www.domain.com",
-	// 	expire,
-	// 	expire.Format(time.UnixDate),
-	// 	86400,
-	// 	true,
-	// 	true,
-	// 	"test=tcookie",
-	// 	[]string{"test=tcookie"}
-	// }
-	// req.AddCookie(&cookie)
+	cookie := &http.Cookie{ Name: "access_token", Value: accessToken}
+
 	http.SetCookie(w, cookie)
-	w.Header().Add("Authenticate", accessTokenRaw)
+	w.Header().Add("access_token", accessToken)
 	http.Redirect(w, r,
-		"http://localhost:8008/",
-		// "http://file:///home/skinny/Documents/go/src/HypertubeAuth/client/client.html",
+		conf.OauthRedirect,
 		http.StatusTemporaryRedirect)
 }
 
 /*
 **	Parsing GET params from request
 */
-func parseRequestParams(r *http.Request) (requestParams, *errors.Error) {
+func parseRequestParams42(r *http.Request) (requestParams, *errors.Error) {
 	var params requestParams
 
 	params.Code = r.FormValue("code")

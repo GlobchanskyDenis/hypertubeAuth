@@ -64,14 +64,15 @@ func CreateUsersTable() *errors.Error {
 		return Err
 	}
 	if _, err := conn.db.Exec("CREATE TABLE users(user_id SERIAL PRIMARY KEY, " +
+		"user_42_id INTEGER, " +
 		"image_body VARCHAR, " +
 		"email VARCHAR CONSTRAINT users_email_key UNIQUE NOT NULL, " +
-		"encryptedPass VARCHAR(35) NOT NULL, " +
-		"first_name VARCHAR NOT NULL, " +
-		"last_name VARCHAR NOT NULL, " +
+		"encryptedPass VARCHAR(35) DEFAULT NULL, " +
+		"first_name VARCHAR DEFAULT NULL, " +
+		"last_name VARCHAR DEFAULT NULL, " +
 		"displayname VARCHAR NOT NULL, " +
 		"is_email_confirmed BOOL NOT NULL DEFAULT false, " +
-		"email_confirm_hash VARCHAR NOT NULL)"); err != nil {
+		"email_confirm_hash VARCHAR NOT NULL DEFAULT '')"); err != nil {
 		return errors.DatabaseError.SetArgs("11", "11").SetOrigin(err)
 	}
 	return nil
@@ -82,10 +83,12 @@ func CreateUsers42StrategyTable() *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	if _, err := conn.db.Exec("CREATE TABLE users_42_strategy(user_id INTEGER PRIMARY KEY, " +
+	if _, err := conn.db.Exec("CREATE TABLE users_42_strategy(user_42_id INTEGER PRIMARY KEY, " +
+		"user_id INTEGER NOT NULL, " +
 		"access_token VARCHAR, " +
 		"refresh_token VARCHAR, " +
-		"expires_at TIMESTAMP)"); err != nil {
+		"expires_at TIMESTAMP, " +
+		"CONSTRAINT user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE)"); err != nil {
 		return errors.DatabaseError.SetArgs("2", "2").SetOrigin(err)
 	}
 	return nil

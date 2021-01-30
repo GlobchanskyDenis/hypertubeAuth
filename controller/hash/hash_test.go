@@ -5,7 +5,6 @@ import (
 	"HypertubeAuth/errors"
 	"HypertubeAuth/logger"
 	"HypertubeAuth/model"
-	"encoding/json"
 	"testing"
 )
 
@@ -19,58 +18,50 @@ func TestHash(t *testing.T) {
 		var user = &model.UserBasic{}
 		user.UserId = 42
 		user.Email = "school21@gmail.com"
-		tokenRaw, Err := CreateTokenBasic(user)
+		accessToken, Err := CreateToken(user)
 		if Err != nil {
 			t_.Errorf("%sError during creating token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
 
-		var token model.Token
-		if err := json.Unmarshal(tokenRaw, &token); err != nil {
-			t_.Errorf("%sError cannot unmarshal token - %s%s" , logger.RED_BG, err.Error(), logger.NO_COLOR)
-			t_.FailNow()
-		}
-
-		if Err = CheckTokenBase64Signature(token.AccessToken); Err != nil {
+		if Err = CheckTokenBase64Signature(accessToken); Err != nil {
 			t_.Errorf("%sError cannot unmarshal token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
-		t.Logf("%sSuccess: token is valid%s", logger.GREEN_BG, logger.NO_COLOR)
+		t_.Logf("%sSuccess: token is valid%s", logger.GREEN_BG, logger.NO_COLOR)
 	})
 
-	t.Run("check user validity", func(t_ *testing.T){
+	t.Run("check token header data validity", func(t_ *testing.T){
 		var user = &model.UserBasic{}
 		user.UserId = 42
 		user.Email = "school21@gmail.com"
 		imageBody := "image_body"
 		user.ImageBody = &imageBody
 		user.Displayname = "skinnyman"
-		user.Fname = "Den"
-		user.Lname = "QWERTY"
-		tokenRaw, Err := CreateTokenBasic(user)
+		fname := "Den"
+		user.Fname = &fname
+		lname := "QWERTY"
+		user.Lname = &lname
+		accessToken, Err := CreateToken(user)
 		if Err != nil {
 			t_.Errorf("%sError during creating token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
 
-		var token model.Token
-		if err := json.Unmarshal(tokenRaw, &token); err != nil {
-			t_.Errorf("%sError cannot unmarshal token - %s%s" , logger.RED_BG, err.Error(), logger.NO_COLOR)
-			t_.FailNow()
-		}
-
-		newUser, Err := getUserFromToken(token.AccessToken)
+		header, Err := GetHeaderFromToken(accessToken)
 		if Err != nil {
 			t_.Errorf("%sError cannot unmarshal token - %s%s" , logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			t_.FailNow()
 		}
 
-		if newUser.UserId != user.UserId || newUser.Fname != user.Fname || newUser.Lname != user.Lname ||
-			newUser.Displayname != user.Displayname || newUser.ImageBody == nil || *newUser.ImageBody != *user.ImageBody {
-			t_.Errorf("%sError some of user field are incorrect after decoding%s" , logger.RED_BG, logger.NO_COLOR)
-			t_.FailNow()
+		if header.UserId != user.UserId {
+			t_.Errorf("%sError: UserId are incorrect after decoding. Expected %d Got %d%s" , logger.RED_BG,
+				user.UserId, header.UserId, logger.NO_COLOR)
 		}
-		t.Logf("%sSuccess: token is valid%s", logger.GREEN_BG, logger.NO_COLOR)
+
+		if !t_.Failed() {
+			t_.Logf("%sSuccess: token is valid%s", logger.GREEN_BG, logger.NO_COLOR)
+		}
 	})
 	
 }

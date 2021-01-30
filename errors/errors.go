@@ -161,7 +161,7 @@ var (
 		"Такой записи не существует в базе данных",
 		"Record not found in database")
 	ImpossibleToExecute = new(121, BusinessType,
-		"Невозможно выполнить команду - не выполнены ключевые условия",
+		"Невозможно выполнить команду",
 		"Imposible to execute command")
 
 	// Internal errors (130 - 139)
@@ -203,6 +203,9 @@ var (
 	DatabaseScanError = new(153, ExternalType,
 		"База данных вернула ошибку во время возвращения результатов запроса",
 		"Database returned error in time of scaning results of query")
+	DatabaseTransactionError = new(154, ExternalType,
+		"База данных вернула ошибку во время создания транзакции",
+		"Database returned error in time of transaction preparing")
 	RedisError = new(154, ExternalType,
 		"Redis вернул ошибку",
 		"Redis returned error")

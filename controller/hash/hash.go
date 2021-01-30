@@ -36,13 +36,24 @@ func getConfig() (*Config, *errors.Error) {
 	return cfg, nil
 }
 
-func PasswdHash(pass string) (string, *errors.Error) {
+func PasswdHash(pass string) (*string, *errors.Error) {
+	conf, Err := getConfig()
+	if Err != nil {
+		return nil, Err
+	}
+	pass += conf.PasswdSalt
+	crcH := crc32.ChecksumIEEE([]byte(pass))
+	passHash := strconv.FormatUint(uint64(crcH), 20)
+	return &passHash, nil
+}
+
+func CreateTokenSignature(header string) (string, *errors.Error) {
 	conf, Err := getConfig()
 	if Err != nil {
 		return "", Err
 	}
-	pass += conf.PasswdSalt
-	crcH := crc32.ChecksumIEEE([]byte(pass))
+	header += conf.PasswdSalt
+	crcH := crc32.ChecksumIEEE([]byte(header))
 	return strconv.FormatUint(uint64(crcH), 20), nil
 }
 
@@ -67,57 +78,20 @@ func EmailHash(mail string) (string, *errors.Error) {
 	return base64.URLEncoding.EncodeToString(token), nil
 }
 
-func CreateToken(user model.User, accountType string) ([]byte, *errors.Error) {
+func CreateToken(user *model.UserBasic) (string, *errors.Error) {
 	var header model.TokenHeader
 	header.UserId = user.UserId
-	header.AccountType = accountType
-	headerJson, err := json.Marshal(header)
-	if err != nil {
-		return nil, errors.MarshalError.SetOrigin(err)
-	}
-	payloadJson, err := json.Marshal(user)
-	if err != nil {
-		return nil, errors.MarshalError.SetOrigin(err)
-	}
 
-	headerPayload := base64.StdEncoding.EncodeToString(headerJson) + "." + base64.StdEncoding.EncodeToString(payloadJson)
-	signature, Err := PasswdHash(headerPayload)
-	if Err != nil {
-		return nil, Err
-	}
-
-	var token = model.Token{
-		AccessToken: base64.StdEncoding.EncodeToString([]byte(headerPayload + "." + signature)),
-		Profile: &user,
-	}
-	tokenJson, err := json.Marshal(token)
-	if err != nil {
-		return nil, errors.MarshalError.SetOrigin(err)
-	}
-	
-	return tokenJson, nil
-}
-
-func CreateAccessTokenBase64(user model.User, accountType string) (string, *errors.Error) {
-	var header model.TokenHeader
-	header.UserId = user.UserId
-	header.AccountType = accountType
 	headerJson, err := json.Marshal(header)
 	if err != nil {
 		return "", errors.MarshalError.SetOrigin(err)
 	}
-	payloadJson, err := json.Marshal(user)
-	if err != nil {
-		return "", errors.MarshalError.SetOrigin(err)
-	}
-
-	headerPayload := base64.StdEncoding.EncodeToString(headerJson) + "." + base64.StdEncoding.EncodeToString(payloadJson)
-	signature, Err := PasswdHash(headerPayload)
+	headerBase64 := base64.StdEncoding.EncodeToString(headerJson)
+	signature, Err := CreateTokenSignature(headerBase64)
 	if Err != nil {
 		return "", Err
 	}
-	
-	return base64.StdEncoding.EncodeToString([]byte(headerPayload + "." + signature)), nil
+	return base64.StdEncoding.EncodeToString([]byte(headerBase64 + "." + signature)), nil
 }
 
 func CheckTokenBase64Signature(accessTokenBase64 string) *errors.Error {
@@ -126,21 +100,21 @@ func CheckTokenBase64Signature(accessTokenBase64 string) *errors.Error {
 		return errors.InvalidToken.SetHidden("Провал декодирования base64").SetOrigin(err)
 	}
 	tokenParts := strings.Split(string(decodedAccessToken), ".")
-	if len(tokenParts) != 3 {
-		return errors.InvalidToken.SetHidden("Токен должен состоять из 3 частей - но содержит "+strconv.Itoa(len(tokenParts)))
+	if len(tokenParts) != 2 {
+		return errors.InvalidToken.SetHidden("Токен должен состоять из 2 частей - но содержит "+strconv.Itoa(len(tokenParts)))
 	}
-	signature, Err := PasswdHash(tokenParts[0] + "." + tokenParts[1])
+	signature, Err := CreateTokenSignature(tokenParts[0])
 	if Err != nil {
 		return Err
 	}
-	if signature != tokenParts[2] {
+	if signature != tokenParts[1] {
 		return errors.InvalidToken.SetHidden("подпись содержит ошибку")
 	}
 	return nil
 }
 
-func CheckTokenPartsSignature(headerPayload, origSignature string) *errors.Error {
-	signature, Err := PasswdHash(headerPayload)
+func CheckTokenPartsSignature(header, origSignature string) *errors.Error {
+	signature, Err := CreateTokenSignature(header)
 	if Err != nil {
 		return Err
 	}
@@ -150,10 +124,23 @@ func CheckTokenPartsSignature(headerPayload, origSignature string) *errors.Error
 	return nil
 }
 
-/*
-func parseHeaderBase64(headerBase64 string) (model.TokenHeader, *errors.Error) {
+func GetHeaderFromToken(accessTokenBase64 string) (model.TokenHeader, *errors.Error) {
 	var header model.TokenHeader
-	decodedHeader, err := base64.StdEncoding.DecodeString(headerBase64)
+
+	decodedAccessToken, err := base64.StdEncoding.DecodeString(accessTokenBase64)
+	if err != nil {
+		return header, errors.InvalidToken.SetHidden("Провал декодирования base64").SetOrigin(err)
+	}
+	tokenParts := strings.Split(string(decodedAccessToken), ".")
+	if len(tokenParts) != 2 {
+		return header, errors.InvalidToken.SetHidden("Токен должен состоять из 2 частей - но содержит "+strconv.Itoa(len(tokenParts)))
+	}
+
+	if Err := CheckTokenPartsSignature(tokenParts[0], tokenParts[1]); Err != nil {
+		return header, Err
+	}
+
+	decodedHeader, err := base64.StdEncoding.DecodeString(tokenParts[0])
 	if err != nil {
 		return header, errors.InvalidToken.SetHidden("Провал декодирования base64").SetOrigin(err)
 	}
@@ -161,30 +148,4 @@ func parseHeaderBase64(headerBase64 string) (model.TokenHeader, *errors.Error) {
 		return header, errors.InvalidToken.SetHidden("Провал декодирования json").SetOrigin(err)
 	}
 	return header, nil
-}
-*/
-
-func GetUserFromToken(accessTokenBase64 string) (model.User, *errors.Error) {
-	var user model.User
-
-	decodedAccessToken, err := base64.StdEncoding.DecodeString(accessTokenBase64)
-	if err != nil {
-		return user, errors.InvalidToken.SetHidden("Провал декодирования base64").SetOrigin(err)
-	}
-	tokenParts := strings.Split(string(decodedAccessToken), ".")
-	if len(tokenParts) != 3 {
-		return user, errors.InvalidToken.SetHidden("Токен должен состоять из 3 частей - но содержит "+strconv.Itoa(len(tokenParts)))
-	}
-	if Err := CheckTokenPartsSignature(tokenParts[0] + "." + tokenParts[1], tokenParts[2]); Err != nil {
-		return user, Err
-	}
-	jsonUser, err := base64.StdEncoding.DecodeString(tokenParts[1])
-	if err != nil {
-		return user, errors.InvalidToken.SetHidden("Провал декодирования base64").SetOrigin(err)
-	}
-	
-	if err = json.Unmarshal(jsonUser, &user); err != nil {
-		return user, errors.InvalidToken.SetHidden("Провал декодирования json").SetOrigin(err)
-	}
-	return user, nil
 }

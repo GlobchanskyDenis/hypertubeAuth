@@ -20,17 +20,18 @@ func Router() http.Handler {
 	mux := http.NewServeMux()
 
 	// GET
-	mux.Handle("/user/auth/basic", corsGet(http.HandlerFunc(userAuthBasic)))
-	mux.Handle("/user/auth/oauth42", corsGet(http.HandlerFunc(userAuthOauth42)))
-	mux.Handle("/info", corsGet(http.HandlerFunc(info)))
+	mux.Handle("/api/auth/basic", corsGet(http.HandlerFunc(authBasic)))
+	mux.Handle("/api/auth/oauth42", corsGet(http.HandlerFunc(authOauth42)))
+	mux.Handle("/api/info", corsGet(http.HandlerFunc(info)))
+	mux.Handle("/api/profile/get", corsGet(authMW(http.HandlerFunc(profileGet))))
 
 	// POST
-	mux.Handle("/token/decode", corsPost(http.HandlerFunc(tokenCheck)))
-	mux.Handle("/user/profile", corsPost(http.HandlerFunc(userProfile)))
+	mux.Handle("/api/auth/check", corsPost(http.HandlerFunc(authCheck)))
 
 	// PUT
-	mux.Handle("/user/create/basic", corsPut(http.HandlerFunc(userCreateBasic)))
-	// mux.HandleFunc("/oauth42/", oauth42)
+	mux.Handle("/api/profile/create", corsPut(http.HandlerFunc(profileCreate)))
+
+	// email confirm
 
 	serveMux := panicRecover(mux)
 

@@ -4,12 +4,18 @@ import (
 	"HypertubeAuth/controller/hash"
 	"HypertubeAuth/errors"
 	"HypertubeAuth/logger"
+	"HypertubeAuth/model"
 	"HypertubeAuth/postgres"
+	"encoding/json"
 	"net/http"
 	"strconv"
 )
 
-func userAuthBasic(w http.ResponseWriter, r *http.Request) {
+/*
+**	/api/auth/basic
+*/
+
+func authBasic(w http.ResponseWriter, r *http.Request) {
 	email, passwd, ok := r.BasicAuth()
 	if !ok {
 		logger.Warning(r, "authenticaion failed - email or password not found")
@@ -31,7 +37,7 @@ func userAuthBasic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.EncryptedPass != encryptedPass {
+	if user.EncryptedPass == nil || encryptedPass == nil || *user.EncryptedPass != *encryptedPass {
 		logger.Warning(r, "authenticaion failed - password missmatch")
 		errorResponse(w, errors.AuthFail)
 		return
@@ -43,12 +49,22 @@ func userAuthBasic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenRaw, Err := hash.CreateToken(user.TransformToUser(), "user_basic")
+	accessToken, Err := hash.CreateToken(user)
 	if Err != nil {
 		logger.Warning(r, "cannot get password hash - " + Err.Error())
 		errorResponse(w, Err)
 		return
 	}
-	successResponse(w, tokenRaw)
+
+	var responseToken = model.Token{ AccessToken: accessToken }
+
+	responseJson, err := json.Marshal(responseToken)
+	if err != nil {
+		logger.Error(r, errors.MarshalError.SetOrigin(err))
+		errorResponse(w, errors.MarshalError)
+		return
+	}
+
+	successResponse(w, responseJson)
 	logger.Success(r, "user #" + strconv.Itoa(int(user.UserId)) + " was authenticated")
 }

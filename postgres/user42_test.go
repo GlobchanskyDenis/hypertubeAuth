@@ -6,15 +6,20 @@ import (
 	"HypertubeAuth/model"
 	"testing"
 	"time"
+	// "fmt"
 )
 
 func TestSetUser42(t *testing.T) {
 	var (
 		user1 = &model.User42{}
 		user2 = &model.User42{}
+		userBasic1 *model.UserBasic
+		userBasic2 *model.UserBasic
 	)
-	user1.UserId = 42
-	user2.UserId = 21
+	user1.User42Id = 42
+	user2.User42Id = 21
+	user1.Email = "email42@gmail.com"
+	user2.Email = "email21@gmail.com"
 	accessToken := "access_token"
 	user1.AccessToken = &accessToken
 	user2.AccessToken = nil
@@ -29,14 +34,22 @@ func TestSetUser42(t *testing.T) {
 
 	defer func(t *testing.T, user1, user2 *model.User42) {
 		t.Run("Delete test user #1", func(t_ *testing.T) {
-			if Err := UserDelete42(user1); Err != nil {
+			if userBasic1 == nil {
+				t_.Logf("%sBasic user 1 not deleted because its nil%s", logger.YELLOW, logger.NO_COLOR)
+				return
+			}
+			if Err := UserDeleteBasic(userBasic1); Err != nil {
 				t_.Errorf("%sError: cannot delete test user - %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			} else {
 				t_.Logf("%sSuccess%s", logger.GREEN_BG, logger.NO_COLOR)
 			}
 		})
 		t.Run("Delete test user #2", func(t_ *testing.T) {
-			if Err := UserDelete42(user2); Err != nil {
+			if userBasic2 == nil {
+				t_.Logf("%sBasic user 2 not deleted because its nil%s", logger.YELLOW, logger.NO_COLOR)
+				return
+			}
+			if Err := UserDeleteBasic(userBasic2); Err != nil {
 				t_.Errorf("%sError: cannot delete test user - %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 			} else {
 				t_.Logf("%sSuccess%s", logger.GREEN_BG, logger.NO_COLOR)
@@ -52,14 +65,14 @@ func TestSetUser42(t *testing.T) {
 	}(t, user1, user2)
 
 	t.Run("valid create user #1", func(t_ *testing.T) {
-		if Err := UserSet42(user1); Err != nil {
+		if userB1, Err := UserSet42(user1); Err != nil {
 			t_.Errorf("%sError: %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		} else {
+			userBasic1 = userB1
 			t_.Logf("%sSuccess: user was created successfully%s", logger.GREEN_BG, logger.NO_COLOR)
 		}
 	})
 
-	// /!!!!!
 	t.Run("valid update user #1", func(t_ *testing.T) {
 		newAccessToken := "new access_token"
 		user1.AccessToken = &newAccessToken
@@ -99,7 +112,9 @@ func TestSetUser42(t *testing.T) {
 	})
 
 	t.Run("valid create user #2", func(t_ *testing.T) {
-		if Err := UserSet42(user2); Err != nil {
+		var Err *errors.Error
+		userBasic2, Err = UserSet42(user2)
+		if Err != nil {
 			t_.Errorf("%sError: %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		} else {
 			t_.Logf("%sSuccess: user was created successfully%s", logger.GREEN_BG, logger.NO_COLOR)
@@ -107,7 +122,7 @@ func TestSetUser42(t *testing.T) {
 	})
 
 	t.Run("invalid create user #1", func(t_ *testing.T) {
-		if Err := UserSet42(user1); Err != nil {
+		if _, Err := UserSet42(user1); Err != nil {
 			if errors.ImpossibleToExecute.IsOverlapWithError(Err) {
 				t_.Logf("%sSuccess: found error that was expected%s", logger.GREEN_BG, logger.NO_COLOR)
 			} else {
@@ -121,7 +136,11 @@ func TestSetUser42(t *testing.T) {
 	})
 
 	t.Run("valid user delete #2", func(t_ *testing.T) {
-		if Err := UserDelete42(user2); Err != nil {
+		if userBasic2 == nil {
+			t_.Errorf("%sError: cannot start test because basic user 2 is nil%s", logger.RED_BG, logger.NO_COLOR)
+			t_.FailNow()
+		}
+		if Err := UserDeleteBasic(userBasic2); Err != nil {
 			t_.Errorf("%sError: %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		} else {
 			t_.Logf("%sSuccess: user was deleted successfully%s", logger.GREEN_BG, logger.NO_COLOR)
@@ -144,7 +163,11 @@ func TestSetUser42(t *testing.T) {
 	})
 
 	t.Run("invalid user delete #2", func(t_ *testing.T) {
-		if Err := UserDelete42(user2); Err != nil {
+		if userBasic2 == nil {
+			t_.Errorf("%sError: cannot start test because basic user 2 is nil%s", logger.RED_BG, logger.NO_COLOR)
+			t_.FailNow()
+		}
+		if Err := UserDeleteBasic(userBasic2); Err != nil {
 			if errors.ImpossibleToExecute.IsOverlapWithError(Err) {
 				t_.Logf("%sSuccess: found error that was expected%s", logger.GREEN_BG, logger.NO_COLOR)
 			} else {
@@ -153,12 +176,12 @@ func TestSetUser42(t *testing.T) {
 			}
 		} else {
 			t_.Errorf("%sError: expected but not found error%s", logger.RED_BG, logger.NO_COLOR)
-
 		}
 	})
 
 	t.Run("valid recreate user #2", func(t_ *testing.T) {
-		if Err := UserSet42(user2); Err != nil {
+		var Err *errors.Error
+		if userBasic2, Err = UserSet42(user2); Err != nil {
 			t_.Errorf("%sError: %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		} else {
 			t_.Logf("%sSuccess: user was created successfully%s", logger.GREEN_BG, logger.NO_COLOR)
@@ -166,7 +189,7 @@ func TestSetUser42(t *testing.T) {
 	})
 
 	t.Run("invalid recreate user #2", func(t_ *testing.T) {
-		if Err := UserSet42(user2); Err != nil {
+		if _, Err := UserSet42(user2); Err != nil {
 			if errors.ImpossibleToExecute.IsOverlapWithError(Err) {
 				t_.Logf("%sSuccess: found error that was expected%s", logger.GREEN_BG, logger.NO_COLOR)
 			} else {

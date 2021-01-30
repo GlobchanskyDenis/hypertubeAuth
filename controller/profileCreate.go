@@ -12,7 +12,11 @@ import (
 	"strconv"
 )
 
-func userCreateBasic(w http.ResponseWriter, r *http.Request) {
+/*
+**	/api/profile/create
+*/
+
+func profileCreate(w http.ResponseWriter, r *http.Request) {
 	user, Err := parseUserBasicFromRequest(r)
 	if Err != nil {
 		logger.Warning(r, Err.Error())

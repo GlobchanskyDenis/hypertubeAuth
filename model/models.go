@@ -7,11 +7,12 @@ import (
 
 type UserBasicModel struct {
 	UserId           uint    `json:"user_id"`
+	User42Id		 *uint	 `json:"-"`
 	ImageBody        *string `json:"image_body"`
 	Email            string  `json:"email"`
-	EncryptedPass    string  `json:"-"`
-	Fname            string  `json:"first_name"`
-	Lname            string  `json:"last_name"`
+	EncryptedPass    *string `json:"-"`
+	Fname            *string `json:"first_name"`
+	Lname            *string `json:"last_name"`
 	Displayname      string  `json:"displayname"`
 	IsEmailConfirmed bool    `json:"-"`
 	EmailConfirmHash string  `json:"-"`
@@ -23,7 +24,8 @@ type UserBasic struct {
 }
 
 type User42Model struct {
-	UserId       uint       `json:"user_id"`
+	User42Id      uint      `json:"-"`
+	UserId		  uint		`json:"-"`
 	AccessToken  *string    `json:"-"`
 	RefreshToken *string    `json:"-"`
 	ExpiresAt    *time.Time `json:"-"`
@@ -31,31 +33,20 @@ type User42Model struct {
 
 type User42 struct {
 	User42Model
-	Email       string `json:"email"`
-	Fname       string `json:"first_name"`
-	Lname       string `json:"last_name"`
-	Displayname string `json:"displayname"`
-	ImageBody   string `json:"image_body"`
-}
-
-type User struct {
-	UserId      uint    `json:"user_id"`
-	Email       string  `json:"email"`
-	Fname       string  `json:"first_name"`
-	Lname       string  `json:"last_name"`
-	Displayname string  `json:"displayname"`
-	ImageBody   *string `json:"image_body"`
+	Email       string `json:"-"`
+	Fname       string `json:"-"`
+	Lname       string `json:"-"`
+	Displayname string `json:"-"`
+	ImageBody   string `json:"-"`
 }
 
 type TokenHeader struct {
 	UserId      uint   `json:"user_id"`
-	AccountType string `json:"account_type"`
 }
 
 type Token struct {
-	ServerPasswd string `json:"server_passwd,omitempty"`
-	AccessToken  string `json:"access_token"`
-	Profile      *User  `json:"profile,omitempty"`
+	ServerPasswd string 	`json:"server_passwd,omitempty"`
+	AccessToken  string 	`json:"access_token"`
 }
 
 func (user UserBasic) Validate() *errors.Error {
@@ -65,24 +56,16 @@ func (user UserBasic) Validate() *errors.Error {
 	return nil
 }
 
-func (user UserBasic) TransformToUser() User {
-	return User{
-		UserId: user.UserId,
-		Email: user.Email,
-		Fname: user.Fname,
-		Lname: user.Lname,
-		Displayname: user.Displayname,
-		ImageBody: user.ImageBody,
-	}
+func (user *UserBasic) Sanitize() {
+	user.Email = ""
 }
 
-func (user User42) TransformToUser() User {
-	return User{
-		UserId: user.UserId,
-		Email: user.Email,
-		Fname: user.Fname,
-		Lname: user.Lname,
-		Displayname: user.Displayname,
-		ImageBody: &user.ImageBody,
-	}
+func (user *UserBasic) ExtractFromUser42(user42 *User42) {
+	user.User42Id = &user42.User42Id
+	user.ImageBody = &user42.ImageBody
+	user.Email = user42.Email
+	user.Fname = &user42.Fname
+	user.Lname = &user42.Lname
+	user.Displayname = user42.Displayname
+	user.IsEmailConfirmed = true
 }
