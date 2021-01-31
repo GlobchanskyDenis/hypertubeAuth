@@ -2,14 +2,14 @@ var serverIP = "localhost"
 var serverPort = "4000"
 var token = ""
 
-function AuthUser() {
-	var mail = document.forms['auth']['mail'].value
-	var pass = document.forms['auth']['pass'].value
-	var authRaw = btoa(encodeURI(mail)+":"+encodeURI(pass))
+function AuthBasic() {
+	var email = document.forms['authBasic']['email'].value
+	var passwd = document.forms['authBasic']['passwd'].value
+	var authRaw = btoa(encodeURI(email)+":"+encodeURI(passwd))
 	console.log("tx: " + authRaw)
 
 	let xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://"+serverIP+":"+serverPort+"/user/auth/basic");
+	xhr.open("GET", "http://"+serverIP+":"+serverPort+"/api/auth/basic");
 	xhr.setRequestHeader("Authorization", "Basic "+authRaw);
 	xhr.send()
 
@@ -33,14 +33,14 @@ function AuthUser() {
 		}
 		document.getElementById("errorField").innerHTML = ""
 		if (!requestAsync.access_token) {
-			document.getElementById("errorField").innerHTML += "uid or token are empty. Its not a valid case";
+			document.getElementById("errorField").innerHTML += "access token is empty. Its not a valid case";
 			return
 		}
 		document.getElementById("responseField").innerHTML = "access_token=hidden"
 		console.log("rx token: " + requestAsync["access_token"]);
 		console.log("rx user profile: " + requestAsync["profile"]);
-		document.forms['auth']['mail'].value = "";
-		document.forms['auth']['pass'].value = "";
+		document.forms['authBasic']['email'].value = "";
+		document.forms['authBasic']['passwd'].value = "";
 		document.token = requestAsync["access_token"]
 	}
 	xhr.onerror = function () {
@@ -48,68 +48,18 @@ function AuthUser() {
 	}
 }
 
-function oAuth42() {
-
-	let xhr = new XMLHttpRequest();
-	xhr.open("GET", "https://api.intra.42.fr/oauth/authorize?"+
-	"client_id=96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"+
-	"&redirect_uri=http://localhost:4000/user/auth/oauth42"+
-	"&scope=public"+
-	"&state=bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"+
-	"&response_type=code", true);
-	// xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-	xhr.send()
-
-	xhr.onload = function () {
-		if (xhr.response) {
-			var requestAsync = JSON.parse(xhr.response);
-		} else {
-			var requestAsync = "";
-		}
-		console.log("rx: " + xhr.status + " : " + xhr.response);
-		if (xhr.status != 200) {
-			document.getElementById("errorField").innerHTML = "Что-то пошло не так: " + xhr.status + " : "
-			document.getElementById("errorField").innerHTML += ((requestAsync.error) ? requestAsync.error : xhr.statusText)
-			document.getElementById("responseField").innerHTML = "";
-			return
-		}
-		if (!requestAsync) {
-			document.getElementById("errorField").innerHTML = "Empty request. Its not a valid case";
-			document.getElementById("responseField").innerHTML = "";
-			return
-		}
-		document.getElementById("errorField").innerHTML = ""
-		if (!requestAsync.access_token) {
-			document.getElementById("errorField").innerHTML += "access_token are empty. Its not a valid case";
-			return
-		}
-		console.log("rx token: " + requestAsync["access_token"]);
-		console.log("rx user profile: " + requestAsync["profile"]);
-		document.getElementById("responseField").innerHTML = "access_token=hidden"
-		document.token = requestAsync["access_token"]
-	}
-	xhr.onerror = function () {
-		console.log("onError event")
-	}
-}
-
-function RegUser() {
-	var mail = document.forms['reg']['mail'].value
-	var pass = document.forms['reg']['pass'].value
-	var fname = document.forms['reg']['first_name'].value
-	var lname = document.forms['reg']['last_name'].value
-	var displayname = document.forms['reg']['displayname'].value
-	var request = JSON.stringify({ "email": mail, "passwd": pass })
+function ProfileCreate() {
+	var email = document.forms['profileCreate']['email'].value
+	var pass = document.forms['profileCreate']['passwd'].value
+	var username = document.forms['profileCreate']['username'].value
 	var user = {
-		email: mail,
+		email: email,
 		passwd: pass,
-		first_name: fname,
-		last_name: lname,
-		displayname: displayname
+		username: username
 	}
 	var request = JSON.stringify(user)
 	let xhr = new XMLHttpRequest();
-	xhr.open("PUT", "http://"+serverIP+":"+serverPort+"/user/create/basic");
+	xhr.open("PUT", "http://"+serverIP+":"+serverPort+"/api/profile/create");
 	console.log("tx: " + request)
 	xhr.send(request);
 	xhr.onload = function () {
@@ -127,10 +77,72 @@ function RegUser() {
 		}
 		document.getElementById("errorField").innerHTML = ""
 		document.getElementById("responseField").innerHTML = "registration was done. Check your email"
-		document.forms['reg']['mail'].value = "";
-		document.forms['reg']['pass'].value = "";
+		document.forms['profileCreate']['email'].value = "";
+		document.forms['profileCreate']['passwd'].value = "";
+		document.forms['profileCreate']['username'].value = "";
 	}
 	xhr.onerror = function () {
 		console.log("onError event")
 	}
+}
+
+function ProfilePatch() {
+	var fname = document.forms['profilePatch']['first_name'].value
+	var lname = document.forms['profilePatch']['last_name'].value
+	var username = document.forms['profilePatch']['username'].value
+	var imageBody = document.getElementById('avatar').src;
+	var user = {};
+	if (fname != "") {
+		user.first_name = fname;
+	}
+	if (lname != "") {
+		user.lirst_name = lname;
+	}
+	if (username != "") {
+		user.username = username;
+	}
+	if (imageBody != "") {
+		user.image_body = imageBody;
+	}
+	var request = JSON.stringify(user)
+	let xhr = new XMLHttpRequest();
+	xhr.open("PATCH", "http://"+serverIP+":"+serverPort+"/api/profile/patch");
+	xhr.setRequestHeader("access_token", document.token)
+	console.log("tx: " + request)
+	xhr.send(request);
+	xhr.onload = function () {
+		if (xhr.response) {
+			var requestAsync = JSON.parse(xhr.response);
+		} else {
+			var requestAsync = "";
+		}
+		console.log("rx: " + xhr.status + " : " + xhr.response);
+		if (xhr.status != 200) {
+			document.getElementById("errorField").innerHTML = "Что-то пошло не так: " + xhr.status + " : "
+			document.getElementById("errorField").innerHTML += ((requestAsync.error) ? requestAsync.error : xhr.statusText)
+			document.getElementById("responseField").innerHTML = "";
+			return
+		}
+		document.getElementById("errorField").innerHTML = ""
+		document.getElementById("responseField").innerHTML = "user profile was patched"
+		document.forms['profilePatch']['first_name'].value = "";
+		document.forms['profilePatch']['last_name'].value = "";
+		document.forms['profilePatch']['username'].value = "";
+	}
+	xhr.onerror = function () {
+		console.log("onError event")
+	}
+}
+
+function readURL(input) {
+	if (input.files && input.files[0]) {
+		var reader = new FileReader();
+		image = document.getElementById('avatar');
+		image.style.display = "block";
+		reader.onload = function (e) {
+			image.setAttribute('src', e.target.result);
+		};
+		reader.readAsDataURL(input.files[0]);
+	}
+	image_statut = true;
 }

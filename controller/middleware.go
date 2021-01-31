@@ -134,3 +134,20 @@ func corsGet(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func corsGetPost(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Methods", "POST,GET,OPTIONS")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,Authorization,access_token")
+		if r.Method == "OPTIONS" {
+			logger.Log(r, "client wants to know what methods are allowed")
+			return
+		} else if r.Method != "GET" && r.Method != "POST" {
+			logger.Warning(r, "wrong request method. Should be GET or POST method")
+			w.WriteHeader(http.StatusMethodNotAllowed) // 405
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}

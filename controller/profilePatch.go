@@ -11,6 +11,12 @@ import (
 	"strconv"
 )
 
+/*
+**	/api/profile/patch
+**	Обновление полей пользователя username first_name last_name image_body
+**	авторизация в авторизационном хидере access_token
+ */
+
 func profilePatch(w http.ResponseWriter, r *http.Request) {
 	user, Err := parseUserBasicFromRequest(r)
 	if Err != nil {

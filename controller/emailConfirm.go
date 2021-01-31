@@ -11,8 +11,8 @@ import (
 )
 
 /*
-**	/api/email/resend
-**	Повторная отправка кода подтверждения почты на почту
+**	/api/email/confirm
+**	Подтверждение почтового адреса
  */
 
 func emailConfirm(w http.ResponseWriter, r *http.Request) {
@@ -56,8 +56,8 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Success(r, "Повторное письмо пользователя #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
-		" обработано и поставлено в очередь на отправку")
+	logger.Success(r, "Пользователь #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
+		" подтвердил свой почтовый адрес "+logger.BLUE+user.Email+logger.NO_COLOR)
 	successResponse(w, nil)
 }
 

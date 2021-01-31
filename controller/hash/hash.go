@@ -12,7 +12,6 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	// "fmt"
 )
 
 type Config struct {
@@ -103,7 +102,7 @@ func EmailHashDecode(code string) (string, *errors.Error) {
 	mail, err := gcm.Open(nil, nonce, encodedToken, nil)
 	if err != nil {
 		return "", errors.ImpossibleToExecute.SetArgs("код подтверждения невалиден",
-		"confirm code invalid").SetHidden("При декодировании токена").SetOrigin(err)
+			"confirm code invalid").SetHidden("При декодировании токена").SetOrigin(err)
 	}
 	return string(mail), nil
 }

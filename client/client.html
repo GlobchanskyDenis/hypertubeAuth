@@ -13,12 +13,11 @@
 
 	<div class="grid_2_places">
 		<div>
-			<form name="auth">
-				<input type="text" class="input_text" name="mail" placeholder="mail">
-				<input type="password" class="input_text" name="pass" placeholder="password">
+			<form name="authBasic">
+				<input type="text" class="input_text" name="email" placeholder="email">
+				<input type="password" class="input_text" name="passwd" placeholder="password">
 			</form>
-			<input type="submit" class="input_submit" value="Авторизация" onclick="AuthUser()">
-			<!-- <input type="submit" class="input_submit" value="школа 21" onclick="oAuth42()"> -->
+			<input type="submit" class="input_submit" value="Авторизация" onclick="AuthBasic()">
 			<form method="get" action="https://api.intra.42.fr/oauth/authorize">
 				<input type="hidden" name="client_id" value="96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53">
 				<input type="hidden" name="redirect_uri" value="http://localhost:4000/user/auth/oauth42">
@@ -29,16 +28,40 @@
 			</form>
 		</div>
 		<div>
-			<form name="reg">
-				<input type="text" class="input_text" name="mail" placeholder="mail">
-				<input type="text" class="input_text" name="displayname" placeholder="displayname">
-				<input type="text" class="input_text" name="first_name" placeholder="first name">
-				<input type="text" class="input_text" name="last_name" placeholder="last name">
-				<input type="password" class="input_text" name="pass" placeholder="password">
+			<form name="profileCreate">
+				<input type="text" class="input_text" name="email" placeholder="email">
+				<input type="text" class="input_text" name="username" placeholder="username">
+				<input type="password" class="input_text" name="passwd" placeholder="password">
 			</form>
-			<input type="submit" class="input_submit" value="Регистрация" onclick="RegUser()">
+			<input type="submit" class="input_submit" value="Регистрация" onclick="ProfileCreate()">
 		</div>
 	</div>
+
+	<div class="grid_2_places">
+		<div>
+			<form name="profilePatch">
+				<input type="text" class="input_text" name="first_name" placeholder="first name">
+				<input type="text" class="input_text" name="last_name" placeholder="last name">
+				<input type="text" class="input_text" name="username" placeholder="username">
+			</form>
+			<form title="выбрать фото">
+				<input type="file" class="input_submit" accept="image/*" onchange="readURL(this);">
+			</form>
+			<input type="submit" class="input_submit" value="Обновить" onclick="ProfilePatch()">
+		</div>
+		<div>
+			<form name="profilePatch">
+				<input type="text" class="input_text" name="first_name" placeholder="first name">
+				<input type="text" class="input_text" name="last_name" placeholder="last name">
+				<input type="text" class="input_text" name="username" placeholder="username">
+			</form>
+			<input type="submit" class="input_submit" value="Обновить" onclick="profilePatch()">
+		</div>
+	</div>
+
+	<img src="" id="avatar">
+
+	
 	
 </body>
 </html>

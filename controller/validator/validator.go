@@ -152,10 +152,10 @@ func ValidateEmail(email string) *errors.Error {
 
 func ValidateName(name string) *errors.Error {
 	if utf8.RuneCountInString(name) < 3 {
-		return errors.InvalidArgument.SetArgs("слишком короткое именя", "too short name")
+		return errors.InvalidArgument.SetArgs("слишком короткое имя", "too short name")
 	}
 	if utf8.RuneCountInString(name) > 20 {
-		return errors.InvalidArgument.SetArgs("слишком длинное именя", "too long name")
+		return errors.InvalidArgument.SetArgs("слишком длинное имя", "too long name")
 	}
 	return nil
 }
