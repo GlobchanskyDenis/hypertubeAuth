@@ -37,7 +37,7 @@ func TestHash(t *testing.T) {
 		user.Email = "school21@gmail.com"
 		imageBody := "image_body"
 		user.ImageBody = &imageBody
-		user.Displayname = "skinnyman"
+		user.Username = "skinnyman"
 		fname := "Den"
 		user.Fname = &fname
 		lname := "QWERTY"

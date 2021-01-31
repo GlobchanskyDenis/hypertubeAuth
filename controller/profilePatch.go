@@ -14,7 +14,7 @@ import (
 /*
 **	/api/profile/patch
 **	Обновление полей пользователя username first_name last_name image_body
-**	авторизация в авторизационном хидере access_token
+**	авторизация в авторизационном хидере accessToken
  */
 
 func profilePatch(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +25,7 @@ func profilePatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken := r.Header.Get("access_token")
+	accessToken := r.Header.Get("accessToken")
 	if accessToken == "" {
 		logger.Error(r, errors.UserNotLogged.SetArgs("отсутствует токен доступа", "access token expected"))
 		errorResponse(w, errors.UserNotLogged)

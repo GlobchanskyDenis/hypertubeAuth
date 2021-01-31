@@ -31,7 +31,7 @@ func panicRecover(next http.Handler) http.Handler {
 
 func authMW(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		accessToken := r.Header.Get("access_token")
+		accessToken := r.Header.Get("accessToken")
 		if accessToken == "" {
 			logger.Error(r, errors.UserNotLogged.SetArgs("отсутствует токен доступа", "access token expected"))
 			errorResponse(w, errors.UserNotLogged)
@@ -50,7 +50,7 @@ func corsPut(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "PUT,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,access_token")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken")
 
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
@@ -68,7 +68,7 @@ func corsDelete(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "DELETE,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,access_token")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken")
 
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
@@ -86,7 +86,7 @@ func corsPost(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "POST,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,access_token")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken")
 
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
@@ -104,7 +104,7 @@ func corsPatch(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "PATCH,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,access_token")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken")
 
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
@@ -122,7 +122,7 @@ func corsGet(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "GET,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,Authorization,access_token")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,Authorization,accessToken")
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
 			return
@@ -139,7 +139,7 @@ func corsGetPost(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "POST,GET,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,Authorization,access_token")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,Authorization,accessToken")
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
 			return

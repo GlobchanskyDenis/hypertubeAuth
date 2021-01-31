@@ -7,13 +7,13 @@ import (
 )
 
 type UserBasicModel struct {
-	UserId           uint    `json:"user_id"`
+	UserId           uint    `json:"userId"`
 	User42Id         *uint   `json:"-"`
-	ImageBody        *string `json:"image_body"`
+	ImageBody        *string `json:"imageBody"`
 	Email            string  `json:"email"`
 	EncryptedPass    *string `json:"-"`
-	Fname            *string `json:"first_name"`
-	Lname            *string `json:"last_name"`
+	Fname            *string `json:"firstName"`
+	Lname            *string `json:"lastName"`
 	Username         string  `json:"username"`
 	IsEmailConfirmed bool    `json:"-"`
 	EmailConfirmHash string  `json:"-"`
@@ -42,12 +42,12 @@ type User42 struct {
 }
 
 type TokenHeader struct {
-	UserId uint `json:"user_id"`
+	UserId uint `json:"userId"`
 }
 
 type Token struct {
-	ServerPasswd string `json:"server_passwd,omitempty"`
-	AccessToken  string `json:"access_token"`
+	ServerPasswd string `json:"serverPasswd,omitempty"`
+	AccessToken  string `json:"accessToken"`
 }
 
 func (user UserBasic) Validate() *errors.Error {

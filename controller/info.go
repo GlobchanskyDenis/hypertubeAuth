@@ -29,12 +29,12 @@ func info(w http.ResponseWriter, r *http.Request) {
 	</br>
 	<b>Поля пользователя</b> Отражены в структуре. Встречаются в запросах в разном составе</br>
 	UserBasic {</br>
-		&emsp;&emsp; user_id	&emsp;&emsp;       integer</br>
+		&emsp;&emsp; userId	&emsp;&emsp;       integer</br>
 		&emsp;&emsp; email      &emsp;&emsp;&emsp; string</br>
 		&emsp;&emsp; passwd     &emsp;&emsp;       string</br>
 		&emsp;&emsp; username   &emsp; string</br>
-		&emsp;&emsp; first_name &emsp; string</br>
-		&emsp;&emsp; last_name  &emsp; string</br>
+		&emsp;&emsp; firstName &emsp; string</br>
+		&emsp;&emsp; lastName  &emsp; string</br>
 	}</br>
 	</br>
 
@@ -60,12 +60,12 @@ func info(w http.ResponseWriter, r *http.Request) {
 	Если мыло = "Aladdin" а пароль = "open sesame", то финальный вид заголовка примет вид:</br>
 	Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==</br>
 	В моем примере (папка client) есть рабочий вариант кода</br>
-	Успешная авторизация - код 200 и json в request body содержащий одно поле - access_token. Токен бессрочный</br>
+	Успешная авторизация - код 200 и json в request body содержащий одно поле - accessToken. Токен бессрочный</br>
 	Провал авторизации: описанная выше ошибка</br></br>
 
 	<b>PUT /api/profile/create Базовая регистрация пользователя</b></br>
 	Обязательные поля для заполнения: email, passwd, username. Завернуть их в json и в тело запроса</br>
-	Поля first_name, last_name, image_body задаются в эндпоинте PATCH /api/profile/patch</br>
+	Поля firstName, lastName, image_body задаются в эндпоинте PATCH /api/profile/patch</br>
 	Успешная регистрация - код 200. В ответе есть тело полей пользователя, но это в основном для возможности тестирования</br>
 	Провал регистрации: описанная выше ошибка</br></br>
 	
@@ -79,9 +79,9 @@ func info(w http.ResponseWriter, r *http.Request) {
 	В случае провела пусть редирект ведет обратно на страницу авторизации.</br></br>
 
 	<b>GET /api/profile/get - возвращение полей юзера</b></br>
-	Эндпоинт доступен только авторизованным пользователям. Для авторизации нужно в заголовок access_token вставить</br>
+	Эндпоинт доступен только авторизованным пользователям. Для авторизации нужно в заголовок accessToken вставить</br>
 	авторизационный токен. Если аргумента в url нет - возвращает поля твоего юзера (идентифицирует по токену)</br>
-	Если в url вставить аргумент user_id=42 то вернутся поля юзера 42 (приватное поле email затрется)</br></br>
+	Если в url вставить аргумент userId=42 то вернутся поля юзера 42 (приватное поле email затрется)</br></br>
 
 	<b>POST /api/email/recend - повторная отправка письма на почту для подтверждения почты</b></br>
 	В теле заголовка в json должно быть запаковано одно поле email. Никаких больше деталей</br></br>
@@ -91,7 +91,7 @@ func info(w http.ResponseWriter, r *http.Request) {
 
 	<b>Эндпоинт проверки, авторизации пользователя</b></br>
 	Предназначен только для внутренних запросов от других сервисов. Требуется знать пароль от сервера (безопасность)</br>
-	В теле запроса нужно в json завернуть поля access_token для моего авторизационного токена и server_passwd для пароля сервера</br>
+	В теле запроса нужно в json завернуть поля accessToken для моего авторизационного токена и server_passwd для пароля сервера</br>
 	Три варианта ответа сервера. 200 - токен валиден, пользователь авторизован</br>
 	401 - проверка подписи провалена, пользователь не авторизован</br>
 	Все остальное - ошибки, которые следует обрабатывать отдельно (пароль сервера не тот, и т д)</br></br>

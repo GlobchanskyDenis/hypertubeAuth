@@ -145,10 +145,10 @@ func TestProfileGet(t *testing.T) {
 			)
 
 			if tc.userId != 0 {
-				url += "?user_id=" + strconv.Itoa(int(tc.userId))
+				url += "?userId=" + strconv.Itoa(int(tc.userId))
 			}
 			req = httptest.NewRequest("GET", url, nil)
-			req.Header.Add("access_token", tc.token)
+			req.Header.Add("accessToken", tc.token)
 
 			/*
 			**	start test

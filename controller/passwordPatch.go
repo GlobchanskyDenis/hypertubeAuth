@@ -15,7 +15,7 @@ import (
 **	/api/password/patch
 **	Обновление пароля пользователя
 **	В запросе должны содержаться поля passwd, new_passwd
-**	авторизация в авторизационном хидере access_token
+**	авторизация в авторизационном хидере accessToken
  */
 
 func passwordPatch(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,7 @@ func passwordPatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken := r.Header.Get("access_token")
+	accessToken := r.Header.Get("accessToken")
 	if accessToken == "" {
 		logger.Error(r, errors.UserNotLogged.SetArgs("отсутствует токен доступа", "access token expected"))
 		errorResponse(w, errors.UserNotLogged)
@@ -87,7 +87,7 @@ func passwordPatch(w http.ResponseWriter, r *http.Request) {
 
 func parsePasswordsFromRequest(r *http.Request) (string, string, *errors.Error) {
 	type Passwords struct {
-		NewPasswd *string `json:"new_passwd"`
+		NewPasswd *string `json:"newPasswd"`
 		Passwd    *string `json:"passwd"`
 	}
 	var pass = Passwords{}
@@ -95,7 +95,7 @@ func parsePasswordsFromRequest(r *http.Request) (string, string, *errors.Error) 
 		return "", "", errors.InvalidRequestBody.SetOrigin(err)
 	}
 	if pass.NewPasswd == nil {
-		return "", "", errors.NoArgument.SetArgs("new_passwd", "new_passwd")
+		return "", "", errors.NoArgument.SetArgs("newPasswd", "newPasswd")
 	}
 	if pass.Passwd == nil {
 		return "", "", errors.NoArgument.SetArgs("passwd", "passwd")

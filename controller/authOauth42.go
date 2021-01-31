@@ -119,10 +119,10 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was authenticated")
-	cookie := &http.Cookie{Name: "access_token", Value: accessToken}
+	cookie := &http.Cookie{Name: "accessToken", Value: accessToken}
 
 	http.SetCookie(w, cookie)
-	w.Header().Add("access_token", accessToken)
+	w.Header().Add("accessToken", accessToken)
 	http.Redirect(w, r,
 		conf.OauthRedirect,
 		http.StatusTemporaryRedirect)

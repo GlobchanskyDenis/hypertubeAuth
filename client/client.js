@@ -87,22 +87,22 @@ function ProfileCreate() {
 }
 
 function ProfilePatch() {
-	var fname = document.forms['profilePatch']['first_name'].value
-	var lname = document.forms['profilePatch']['last_name'].value
+	var fname = document.forms['profilePatch']['firstName'].value
+	var lname = document.forms['profilePatch']['lastName'].value
 	var username = document.forms['profilePatch']['username'].value
 	var imageBody = document.getElementById('avatar').src;
 	var user = {};
 	if (fname != "") {
-		user.first_name = fname;
+		user.firstName = fname;
 	}
 	if (lname != "") {
-		user.lirst_name = lname;
+		user.lastName = lname;
 	}
 	if (username != "") {
 		user.username = username;
 	}
 	if (imageBody != "") {
-		user.image_body = imageBody;
+		user.imageBody = imageBody;
 	}
 	var request = JSON.stringify(user)
 	let xhr = new XMLHttpRequest();
@@ -125,8 +125,8 @@ function ProfilePatch() {
 		}
 		document.getElementById("errorField").innerHTML = ""
 		document.getElementById("responseField").innerHTML = "user profile was patched"
-		document.forms['profilePatch']['first_name'].value = "";
-		document.forms['profilePatch']['last_name'].value = "";
+		document.forms['profilePatch']['firstName'].value = "";
+		document.forms['profilePatch']['lastName'].value = "";
 		document.forms['profilePatch']['username'].value = "";
 	}
 	xhr.onerror = function () {

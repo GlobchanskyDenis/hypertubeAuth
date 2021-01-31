@@ -14,7 +14,7 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 	/*
 	**	Получаю токен из заголовка
 	 */
-	accessToken := r.Header.Get("access_token")
+	accessToken := r.Header.Get("accessToken")
 	if accessToken == "" {
 		logger.Error(r, errors.UserNotLogged.SetArgs("отсутствует токен доступа", "access token expected"))
 		errorResponse(w, errors.UserNotLogged)
@@ -29,7 +29,7 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var id uint
-	var idString = r.FormValue("user_id")
+	var idString = r.FormValue("userId")
 	if idString != "" {
 		idInt, err := strconv.Atoi(idString)
 		if err != nil {
