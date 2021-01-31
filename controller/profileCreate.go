@@ -36,7 +36,7 @@ func profileCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.EmailConfirmHash, Err = hash.EmailHash(user.Email); Err != nil {
+	if user.EmailConfirmHash, Err = hash.EmailHashEncode(user.Email); Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)
 		return

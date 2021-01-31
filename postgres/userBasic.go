@@ -115,34 +115,13 @@ func UserConfirmEmailBasic(user *model.UserBasic) *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	stmt1, err := conn.db.Prepare(`SELECT email_confirm_hash FROM users WHERE user_id = $1`)
+
+	stmt, err := conn.db.Prepare(`UPDATE users SET is_email_confirmed = true WHERE user_id = $1`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
-	defer stmt1.Close()
-	rows, err := stmt1.Query(user.UserId)
-	if err != nil {
-		return errors.DatabaseExecutingError.SetOrigin(err)
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return errors.UserNotExist
-	}
-	var emailConfirmHash string
-	if err := rows.Scan(&emailConfirmHash); err != nil {
-		return errors.DatabaseScanError.SetOrigin(err)
-	}
-
-	if user.EmailConfirmHash != emailConfirmHash {
-		return errors.ImpossibleToExecute.SetArgs("неверный код подтверждения почты", "invalid email confirm code")
-	}
-
-	stmt2, err := conn.db.Prepare(`UPDATE users SET is_email_confirmed = true WHERE user_id = $1`)
-	if err != nil {
-		return errors.DatabasePreparingError.SetOrigin(err)
-	}
-	defer stmt2.Close()
-	result, err := stmt2.Exec(user.UserId)
+	defer stmt.Close()
+	result, err := stmt.Exec(user.UserId)
 	if err != nil {
 		return errors.DatabaseExecutingError.SetOrigin(err)
 	}
@@ -167,12 +146,12 @@ func UserUpdateBasic(user *model.UserBasic) *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	stmt, err := conn.db.Prepare(`UPDATE users SET image_body=$2, email=$3, first_name=$4,
-		last_name=$5, username=$6 WHERE user_id = $1`)
+	stmt, err := conn.db.Prepare(`UPDATE users SET image_body=$2, first_name=$3,
+		last_name=$4, username=$5 WHERE user_id = $1`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
-	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Email, user.Fname, user.Lname, user.Username)
+	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Fname, user.Lname, user.Username)
 	if err != nil {
 		return errors.DatabaseExecutingError.SetOrigin(err)
 	}

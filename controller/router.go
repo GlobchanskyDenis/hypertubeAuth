@@ -27,16 +27,18 @@ func Router() http.Handler {
 
 	// POST
 	mux.Handle("/api/auth/check", corsPost(http.HandlerFunc(authCheck)))
+	mux.Handle("/api/email/resend", corsPost(http.HandlerFunc(emailResend)))
+	mux.Handle("/api/email/confirm", corsPost(http.HandlerFunc(emailConfirm)))
 
 	// PUT
 	mux.Handle("/api/profile/create", corsPut(http.HandlerFunc(profileCreate)))
 
+	// PATCH
+	mux.Handle("/api/profile/patch", corsPatch(http.HandlerFunc(profilePatch)))
+
 	// /email/patch
-	// /email/confirm
-	// /email/resend
 	// /passwd/repair
 	// /passwd/patch
-	// /profile/patch
 	// /profile/delete
 
 	serveMux := panicRecover(mux)

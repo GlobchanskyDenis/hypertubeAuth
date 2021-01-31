@@ -57,7 +57,7 @@ func CreateTokenSignature(header string) (string, *errors.Error) {
 	return strconv.FormatUint(uint64(crcH), 20), nil
 }
 
-func EmailHash(mail string) (string, *errors.Error) {
+func EmailHashEncode(mail string) (string, *errors.Error) {
 	conf, Err := getConfig()
 	if Err != nil {
 		return "", Err
@@ -76,6 +76,36 @@ func EmailHash(mail string) (string, *errors.Error) {
 	}
 	token := gcm.Seal(nonce, nonce, []byte(mail), nil)
 	return base64.URLEncoding.EncodeToString(token), nil
+}
+
+func EmailHashDecode(code string) (string, *errors.Error) {
+	conf, Err := getConfig()
+	if Err != nil {
+		return "", Err
+	}
+	encodedToken, _ := base64.URLEncoding.DecodeString(code)
+	c, err := aes.NewCipher([]byte(conf.MasterKey))
+	if err != nil {
+		return "", errors.ImpossibleToExecute.SetArgs("код подтверждения невалиден",
+			"confirm code invalid").SetHidden("На этапе расшифровки мастер ключем").SetOrigin(err)
+	}
+	gcm, err := cipher.NewGCM(c)
+	if err != nil {
+		return "", errors.ImpossibleToExecute.SetArgs("код подтверждения невалиден",
+			"confirm code invalid").SetHidden("На этапе расшифровки").SetOrigin(err)
+	}
+	nonceSize := gcm.NonceSize()
+	if len(encodedToken) < nonceSize {
+		return "", errors.ImpossibleToExecute.SetArgs("код подтверждения невалиден",
+			"confirm code invalid").SetHidden("ошибка размера при декодировании токена")
+	}
+	nonce, encodedToken := encodedToken[:nonceSize], encodedToken[nonceSize:]
+	mail, err := gcm.Open(nil, nonce, encodedToken, nil)
+	if err != nil {
+		return "", errors.ImpossibleToExecute.SetArgs("код подтверждения невалиден",
+		"confirm code invalid").SetHidden("При декодировании токена").SetOrigin(err)
+	}
+	return string(mail), nil
 }
 
 func CreateToken(user *model.UserBasic) (string, *errors.Error) {

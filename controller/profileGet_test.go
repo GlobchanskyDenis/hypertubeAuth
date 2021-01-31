@@ -38,7 +38,7 @@ func TestProfileGet(t *testing.T) {
 		t.FailNow()
 	}
 	user1.Username = "user1"
-	if user1.EmailConfirmHash, Err = hash.EmailHash(user1.Email); Err != nil {
+	if user1.EmailConfirmHash, Err = hash.EmailHashEncode(user1.Email); Err != nil {
 		t.Errorf("%sError: не смог создать хэш почты %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		t.FailNow()
 	}
@@ -70,7 +70,7 @@ func TestProfileGet(t *testing.T) {
 		t.FailNow()
 	}
 	user2.Username = "user2"
-	if user2.EmailConfirmHash, Err = hash.EmailHash(user2.Email); Err != nil {
+	if user2.EmailConfirmHash, Err = hash.EmailHashEncode(user2.Email); Err != nil {
 		t.Errorf("%sError: не смог создать хэш почты %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		t.FailNow()
 	}

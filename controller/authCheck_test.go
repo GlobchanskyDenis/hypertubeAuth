@@ -39,7 +39,7 @@ func TestAuthCheck(t *testing.T) {
 		t.FailNow()
 	}
 	user.Username = "user1"
-	if user.EmailConfirmHash, Err = hash.EmailHash(user.Email); Err != nil {
+	if user.EmailConfirmHash, Err = hash.EmailHashEncode(user.Email); Err != nil {
 		t.Errorf("%sError: не смог создать хэш почты %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		t.FailNow()
 	}
