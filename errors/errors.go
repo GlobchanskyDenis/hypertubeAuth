@@ -32,8 +32,8 @@ type Error struct {
 
 type jsonExportedError struct {
 	Code uint   `json:"code"`
-	Ru   string `json:"description_ru"`
-	Eng  string `json:"description_eng"`
+	Ru   string `json:"ru"`
+	Eng  string `json:"en"`
 }
 
 func new(code uint, errorType errorType, ruDescription string, engDescription string) *Error {
@@ -212,4 +212,7 @@ var (
 	MailerError = new(155, ExternalType,
 		"Mailer вернул ошибку",
 		"Mailer returned error")
+	ApiError = new(156, ExternalType,
+		"Внешний сервис вернул ошибку",
+		"External service returned error")
 )

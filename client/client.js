@@ -48,6 +48,37 @@ function AuthBasic() {
 	}
 }
 
+function AuthAlternate() {
+	let xhr = new XMLHttpRequest();
+	xhr.open("GET", "http://"+serverIP+":"+serverPort+"/api/auth/oauth42/alternate");
+	xhr.send()
+	document.getElementById("errorField").innerHTML = "";
+	document.getElementById("responseField").innerHTML = "В процессе";
+
+	xhr.onload = function () {
+		console.log("rx: " + xhr.status + " : " + xhr.response);
+		if (xhr.status == 200) {
+			document.getElementById("errorField").innerHTML = ""
+			document.getElementById("responseField").innerHTML = xhr.status + " : " + xhr.response;
+		} else {
+			document.getElementById("errorField").innerHTML = "Что-то пошло не так: " + xhr.status + " : " + xhr.response;
+			document.getElementById("responseField").innerHTML = "";
+		}
+	}
+	xhr.onerror = function () {
+		console.log("onError event")
+	}
+	// xhr.onprogress = function () {
+	// 	document.getElementById("errorField").innerHTML = "";
+	// 	document.getElementById("responseField").innerHTML = "В процессе";
+	// }
+
+	// xhr.onreadystatechange = function () {
+	// 	document.getElementById("errorField").innerHTML = "";
+	// 	document.getElementById("responseField").innerHTML = "onreadystatechange";
+	// }
+}
+
 function ProfileCreate() {
 	var email = document.forms['profileCreate']['email'].value
 	var pass = document.forms['profileCreate']['passwd'].value
@@ -87,9 +118,9 @@ function ProfileCreate() {
 }
 
 function ProfilePatch() {
-	var fname = document.forms['profilePatch']['firstName'].value
-	var lname = document.forms['profilePatch']['lastName'].value
-	var username = document.forms['profilePatch']['username'].value
+	var fname = document.forms['profilePatch']['firstName'].value;
+	var lname = document.forms['profilePatch']['lastName'].value;
+	var username = document.forms['profilePatch']['username'].value;
 	var imageBody = document.getElementById('avatar').src;
 	var user = {};
 	if (fname != "") {

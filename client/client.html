@@ -18,9 +18,10 @@
 				<input type="password" class="input_text" name="passwd" placeholder="password">
 			</form>
 			<input type="submit" class="input_submit" value="Авторизация" onclick="AuthBasic()">
+			<input type="submit" class="input_submit" value="альтернатива" onclick="AuthAlternate()">
 			<form method="get" action="https://api.intra.42.fr/oauth/authorize">
 				<input type="hidden" name="client_id" value="96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53">
-				<input type="hidden" name="redirect_uri" value="http://localhost:4000/user/auth/oauth42">
+				<input type="hidden" name="redirect_uri" value="http://localhost:4000/api/auth/oauth42">
 				<input type="hidden" name="scope" value="public">
 				<input type="hidden" name="state" value="bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d">
 				<input type="hidden" name="response_type" value="code">

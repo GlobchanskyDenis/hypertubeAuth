@@ -5,9 +5,12 @@ import (
 )
 
 type Config struct {
-	OauthRedirect string `conf:"oauthRedirect"`
-	ServerPasswd  string `conf:"passwd"`
-	ServerPort    uint   `conf:"port"`
+	ServerPasswd        string `conf:"passwd"`
+	ServerPort          uint   `conf:"port"`
+	SocketRedirect      string `conf:"socketRedirect"`
+	OauthRedirect       string `conf:"oauthRedirect"`
+	ErrorRedirect       string `conf:"errorRedirect"`
+	PasswdResetRedirect string `conf:"passwdResetRedirect"`
 }
 
 var cfg *Config

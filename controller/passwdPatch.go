@@ -12,13 +12,13 @@ import (
 )
 
 /*
-**	/api/password/patch
+**	/api/passwd/patch
 **	Обновление пароля пользователя
-**	В запросе должны содержаться поля passwd, new_passwd
+**	В запросе должны содержаться поля passwd, newPasswd
 **	авторизация в авторизационном хидере accessToken
  */
 
-func passwordPatch(w http.ResponseWriter, r *http.Request) {
+func passwdPatch(w http.ResponseWriter, r *http.Request) {
 	passwd, newPasswd, Err := parsePasswordsFromRequest(r)
 	if Err != nil {
 		logger.Warning(r, Err.Error())

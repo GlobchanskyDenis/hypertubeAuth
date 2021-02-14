@@ -106,17 +106,17 @@ func UserSet42(user *model.User42) (*model.UserBasic, *errors.Error) {
 // 	return nil
 // }
 
-func UserGet42ById(userId uint) (*model.User42, *errors.Error) {
+func UserGet42ById(user42Id uint) (*model.User42, *errors.Error) {
 	conn, Err := getConnection()
 	if Err != nil {
 		return nil, Err
 	}
-	stmt, err := conn.db.Prepare(`SELECT * FROM users_42_strategy WHERE user_id = $1`)
+	stmt, err := conn.db.Prepare(`SELECT * FROM users_42_strategy WHERE user_42_id = $1`)
 	if err != nil {
 		return nil, errors.DatabasePreparingError.SetOrigin(err)
 	}
 	defer stmt.Close()
-	rows, err := stmt.Query(userId)
+	rows, err := stmt.Query(user42Id)
 	if err != nil {
 		return nil, errors.DatabaseExecutingError.SetOrigin(err)
 	}

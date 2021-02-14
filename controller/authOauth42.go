@@ -6,6 +6,7 @@ import (
 	"HypertubeAuth/logger"
 	"HypertubeAuth/model"
 	"HypertubeAuth/postgres"
+	// "encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"net"
@@ -33,7 +34,7 @@ type token42 struct {
 }
 
 type profile42 struct {
-	UserId      uint   `json:"id"`
+	User42Id      uint   `json:"id"`
 	Email       string `json:"email"`
 	Fname       string `json:"first_name"`
 	Lname       string `json:"last_name"`
@@ -45,10 +46,23 @@ type profile42 struct {
 **	/api/auth/oauth42
  */
 func authOauth42(w http.ResponseWriter, r *http.Request) {
+	conf, Err := getConfig()
+	if Err != nil {
+		logger.Error(r, Err)
+		// errorResponse(w, Err)
+		http.Redirect(w, r,
+			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),//base64.StdEncoding.EncodeToString(Err.ToJson())
+			http.StatusTemporaryRedirect)
+		return
+	}
+
 	params, Err := parseRequestParams42(r)
 	if Err != nil {
 		logger.Warning(r, Err.Error())
-		errorResponse(w, Err)
+		// errorResponse(w, Err)
+		http.Redirect(w, r,
+			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			http.StatusTemporaryRedirect)
 		return
 	}
 	/*
@@ -57,7 +71,10 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	token, Err := getTokenFrom42(params)
 	if Err != nil {
 		logger.Error(r, Err)
-		errorResponse(w, Err)
+		// errorResponse(w, Err)
+		http.Redirect(w, r,
+			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			http.StatusTemporaryRedirect)
 		return
 	}
 	/*
@@ -66,7 +83,10 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	user, Err := getUser42(token)
 	if Err != nil {
 		logger.Error(r, Err)
-		errorResponse(w, Err)
+		// errorResponse(w, Err)
+		http.Redirect(w, r,
+			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -74,32 +94,45 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	/*
 	**	getting user from db if it exists
 	 */
-	userFromDb, Err := postgres.UserGet42ById(user.UserId)
+	userFromDb, Err := postgres.UserGet42ById(user.User42Id)
 	if Err != nil {
-		if !errors.UserNotExist.IsOverlapWithError(Err) {
-			// user
-			logger.Error(r, Err.SetArgs("1", "1"))
-			errorResponse(w, Err)
-			return
-		} else {
+		if errors.UserNotExist.IsOverlapWithError(Err) {
+			// user not exists
 			logger.Log(r, "User42 with user42Id "+strconv.Itoa(int(user.User42Id))+" not found in database. Creating new one")
 			if userBasic, Err = postgres.UserSet42(user); Err != nil {
-				logger.Error(r, Err.SetArgs("2", "2"))
-				errorResponse(w, Err)
+				logger.Error(r, Err.SetArgs("1", "1"))
+				// errorResponse(w, Err)
+				http.Redirect(w, r,
+					conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+					http.StatusTemporaryRedirect)
 				return
 			}
+		} else {
+			// database error
+			logger.Error(r, Err.SetArgs("2", "2"))
+			// errorResponse(w, Err)
+			http.Redirect(w, r,
+				conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+				http.StatusTemporaryRedirect)
+			return
 		}
 	} else {
 		user.UserId = userFromDb.UserId
 		if Err = postgres.UserUpdate42(user); Err != nil {
 			logger.Error(r, Err.SetArgs("3", "3"))
-			errorResponse(w, Err)
+			// errorResponse(w, Err)
+			http.Redirect(w, r,
+				conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+				http.StatusTemporaryRedirect)
 			return
 		}
 		userBasic, Err = postgres.UserGetBasicById(user.UserId)
 		if Err = postgres.UserUpdate42(user); Err != nil {
 			logger.Error(r, Err.SetArgs("4", "4"))
-			errorResponse(w, Err)
+			// errorResponse(w, Err)
+			http.Redirect(w, r,
+				conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+				http.StatusTemporaryRedirect)
 			return
 		}
 	}
@@ -107,24 +140,20 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	accessToken, Err := hash.CreateToken(userBasic)
 	if Err != nil {
 		logger.Warning(r, "cannot get password hash - "+Err.Error())
-		errorResponse(w, Err)
-		return
-	}
-
-	conf, Err := getConfig()
-	if Err != nil {
-		logger.Error(r, Err)
-		errorResponse(w, Err)
+		// errorResponse(w, Err)
+		http.Redirect(w, r,
+			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			http.StatusTemporaryRedirect)
 		return
 	}
 
 	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was authenticated")
-	cookie := &http.Cookie{Name: "accessToken", Value: accessToken}
+	cookie := &http.Cookie{Name: "accessToken", Value: accessToken, HttpOnly: false}
 
 	http.SetCookie(w, cookie)
-	w.Header().Add("accessToken", accessToken)
+	// w.Header().Add("accessToken", accessToken)
 	http.Redirect(w, r,
-		conf.OauthRedirect,
+		conf.SocketRedirect + conf.OauthRedirect + "?accessToken=" + accessToken,
 		http.StatusTemporaryRedirect)
 }
 
@@ -168,7 +197,7 @@ func getTokenFrom42(params requestParams) (token42, *errors.Error) {
 		"code":          {params.Code},
 		"state":         {params.State},
 		// "redirect_uri": {"file:///home/skinny/Documents/go/src/HypertubeAuth/client/client.html",},
-		"redirect_uri": {"http://localhost:" + portString + "/user/auth/oauth42"},
+		"redirect_uri": {"http://localhost:" + portString + "/api/auth/oauth42"},
 		"grant_type":   {"authorization_code"},
 	}
 	resp, err := http.PostForm("https://api.intra.42.fr/oauth/token", formData)
@@ -205,7 +234,7 @@ func refreshTokenFrom42(refreshToken string) (token42, *errors.Error) {
 		"client_id":     {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"},
 		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"},
 		"refresh_token": {refreshToken},
-		"redirect_uri":  {"http://localhost:" + portString + "/user/auth/oauth42"},
+		"redirect_uri":  {"http://localhost:" + portString + "/api/auth/oauth42"},
 		"grant_type":    {"refresh_token"},
 	}
 	resp, err := http.PostForm("https://api.intra.42.fr/oauth/token", formData)
@@ -260,7 +289,6 @@ func getUserProfile(accessToken string) (profile42, *errors.Error) {
 	if err != nil {
 		return profile, errors.AccessDenied.SetHidden("Чтение данных пользователя 42 провалено").SetOrigin(err)
 	}
-
 	if err = json.Unmarshal(respBody, &profile); err != nil {
 		return profile, errors.AccessDenied.SetHidden("Декодирование данных пользователя из json дало ошибку").SetOrigin(err)
 	}
@@ -283,7 +311,7 @@ func getUser42(token token42) (*model.User42, *errors.Error) {
 		Displayname: profile.Displayname,
 		ImageBody:   profile.ImageBody,
 		User42Model: model.User42Model{
-			UserId:       profile.UserId,
+			User42Id:     profile.User42Id,
 			AccessToken:  &token.AccessToken,
 			RefreshToken: &token.RefreshToken,
 			ExpiresAt:    &token.ExpiresAt,

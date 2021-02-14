@@ -36,7 +36,7 @@ func Router() http.Handler {
 
 	// PATCH
 	mux.Handle("/api/profile/patch", corsPatch(authMW(http.HandlerFunc(profilePatch))))
-	mux.Handle("/api/passwd/patch", corsPatch(authMW(http.HandlerFunc(passwordPatch))))
+	mux.Handle("/api/passwd/patch", corsPatch(authMW(http.HandlerFunc(passwdPatch))))
 
 	// DELETE
 	mux.Handle("/api/profile/delete", corsDelete(authMW(http.HandlerFunc(profileDelete))))
