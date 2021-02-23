@@ -13,10 +13,10 @@ import (
 
 /*
 **	/api/profile/patch
-**	Обновление полей пользователя username first_name last_name image_body
+**	Обновление полей пользователя username, first_name, last_name, image_body
 **	авторизация в авторизационном хидере accessToken
+**	-- Проверено
  */
-
 func profilePatch(w http.ResponseWriter, r *http.Request) {
 	user, Err := parseUserBasicFromRequest(r)
 	if Err != nil {
@@ -32,7 +32,7 @@ func profilePatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header, Err := hash.GetHeaderFromToken(accessToken)
+	header, Err := hash.GetHeaderFromAccessToken(accessToken)
 	if Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)

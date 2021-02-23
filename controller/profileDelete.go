@@ -15,12 +15,12 @@ import (
 **	Удаление пользователя
 **	В запросе должно содержаться поле passwd
 **	авторизация в авторизационном хидере accessToken
+**	-- Не протестировано
  */
-
 func profileDelete(w http.ResponseWriter, r *http.Request) {
 	passwd, Err := parsePasswordFromRequest(r)
 	if Err != nil {
-		logger.Warning(r, Err.Error())
+		logger.Error(r, Err)
 		errorResponse(w, Err)
 		return
 	}
@@ -32,7 +32,7 @@ func profileDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header, Err := hash.GetHeaderFromToken(accessToken)
+	header, Err := hash.GetHeaderFromAccessToken(accessToken)
 	if Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)

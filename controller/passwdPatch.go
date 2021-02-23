@@ -16,8 +16,8 @@ import (
 **	Обновление пароля пользователя
 **	В запросе должны содержаться поля passwd, newPasswd
 **	авторизация в авторизационном хидере accessToken
+**	-- Проверено
  */
-
 func passwdPatch(w http.ResponseWriter, r *http.Request) {
 	passwd, newPasswd, Err := parsePasswordsFromRequest(r)
 	if Err != nil {
@@ -33,7 +33,7 @@ func passwdPatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header, Err := hash.GetHeaderFromToken(accessToken)
+	header, Err := hash.GetHeaderFromAccessToken(accessToken)
 	if Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)

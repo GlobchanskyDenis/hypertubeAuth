@@ -9,6 +9,10 @@ import (
 	"net/http"
 )
 
+/*
+**	Проверка авторизации - этот эндпоинт должен дергать только Гриша
+**	-- Проверено
+ */
 func authCheck(w http.ResponseWriter, r *http.Request) {
 	var token model.Token
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {
@@ -30,7 +34,7 @@ func authCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if Err := hash.CheckTokenBase64Signature(token.AccessToken); Err != nil {
+	if Err := hash.CheckAccessTokenSignature(token.AccessToken); Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)
 		return

@@ -6,7 +6,6 @@ import (
 	"HypertubeAuth/logger"
 	"HypertubeAuth/model"
 	"HypertubeAuth/postgres"
-	// "encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"net"
@@ -14,7 +13,6 @@ import (
 	"net/url"
 	"strconv"
 	"time"
-	// "fmt"
 )
 
 type requestParams struct {
@@ -34,7 +32,7 @@ type token42 struct {
 }
 
 type profile42 struct {
-	User42Id      uint   `json:"id"`
+	User42Id    uint   `json:"id"`
 	Email       string `json:"email"`
 	Fname       string `json:"first_name"`
 	Lname       string `json:"last_name"`
@@ -44,14 +42,15 @@ type profile42 struct {
 
 /*
 **	/api/auth/oauth42
+**	Авторизация oauth школы 21
+**	-- Проверено
  */
 func authOauth42(w http.ResponseWriter, r *http.Request) {
 	conf, Err := getConfig()
 	if Err != nil {
 		logger.Error(r, Err)
-		// errorResponse(w, Err)
 		http.Redirect(w, r,
-			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),//base64.StdEncoding.EncodeToString(Err.ToJson())
+			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())), //base64.StdEncoding.EncodeToString(Err.ToJson())
 			http.StatusTemporaryRedirect)
 		return
 	}
@@ -59,9 +58,8 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	params, Err := parseRequestParams42(r)
 	if Err != nil {
 		logger.Warning(r, Err.Error())
-		// errorResponse(w, Err)
 		http.Redirect(w, r,
-			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 			http.StatusTemporaryRedirect)
 		return
 	}
@@ -71,9 +69,8 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	token, Err := getTokenFrom42(params)
 	if Err != nil {
 		logger.Error(r, Err)
-		// errorResponse(w, Err)
 		http.Redirect(w, r,
-			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 			http.StatusTemporaryRedirect)
 		return
 	}
@@ -83,9 +80,8 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	user, Err := getUser42(token)
 	if Err != nil {
 		logger.Error(r, Err)
-		// errorResponse(w, Err)
 		http.Redirect(w, r,
-			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 			http.StatusTemporaryRedirect)
 		return
 	}
@@ -101,18 +97,16 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 			logger.Log(r, "User42 with user42Id "+strconv.Itoa(int(user.User42Id))+" not found in database. Creating new one")
 			if userBasic, Err = postgres.UserSet42(user); Err != nil {
 				logger.Error(r, Err.SetArgs("1", "1"))
-				// errorResponse(w, Err)
 				http.Redirect(w, r,
-					conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+					conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 					http.StatusTemporaryRedirect)
 				return
 			}
 		} else {
 			// database error
 			logger.Error(r, Err.SetArgs("2", "2"))
-			// errorResponse(w, Err)
 			http.Redirect(w, r,
-				conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+				conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 				http.StatusTemporaryRedirect)
 			return
 		}
@@ -120,29 +114,26 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 		user.UserId = userFromDb.UserId
 		if Err = postgres.UserUpdate42(user); Err != nil {
 			logger.Error(r, Err.SetArgs("3", "3"))
-			// errorResponse(w, Err)
 			http.Redirect(w, r,
-				conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+				conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 				http.StatusTemporaryRedirect)
 			return
 		}
 		userBasic, Err = postgres.UserGetBasicById(user.UserId)
 		if Err = postgres.UserUpdate42(user); Err != nil {
 			logger.Error(r, Err.SetArgs("4", "4"))
-			// errorResponse(w, Err)
 			http.Redirect(w, r,
-				conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+				conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 				http.StatusTemporaryRedirect)
 			return
 		}
 	}
 
-	accessToken, Err := hash.CreateToken(userBasic)
+	accessToken, Err := hash.CreateAccessToken(userBasic)
 	if Err != nil {
 		logger.Warning(r, "cannot get password hash - "+Err.Error())
-		// errorResponse(w, Err)
 		http.Redirect(w, r,
-			conf.SocketRedirect + conf.ErrorRedirect + "?error=" + url.QueryEscape(string(Err.ToJson())),
+			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 			http.StatusTemporaryRedirect)
 		return
 	}
@@ -153,7 +144,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 	// w.Header().Add("accessToken", accessToken)
 	http.Redirect(w, r,
-		conf.SocketRedirect + conf.OauthRedirect + "?accessToken=" + accessToken,
+		conf.SocketRedirect+conf.OauthRedirect+"?accessToken="+accessToken,
 		http.StatusTemporaryRedirect)
 }
 

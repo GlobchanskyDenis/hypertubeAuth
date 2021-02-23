@@ -25,6 +25,9 @@ func Router() http.Handler {
 	mux.Handle("/api/info", corsGet(http.HandlerFunc(info)))
 	mux.Handle("/api/profile/get", corsGet(authMW(http.HandlerFunc(profileGet))))
 
+	// GET IMAGES
+	mux.Handle("/api/image", corsGet(http.HandlerFunc(image)))
+
 	// POST
 	mux.Handle("/api/auth/check", corsPost(http.HandlerFunc(authCheck)))
 	mux.Handle("/api/email/resend", corsPost(http.HandlerFunc(emailResend)))

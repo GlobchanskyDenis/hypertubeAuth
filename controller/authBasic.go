@@ -13,6 +13,7 @@ import (
 
 /*
 **	/api/auth/basic
+**	-- Проверено
  */
 
 func authBasic(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +56,7 @@ func authBasic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, Err := hash.CreateToken(user)
+	accessToken, Err := hash.CreateAccessToken(user)
 	if Err != nil {
 		logger.Warning(r, "cannot get password hash - "+Err.Error())
 		errorResponse(w, Err)

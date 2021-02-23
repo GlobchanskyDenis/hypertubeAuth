@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+/*
+**	Все middleware функции для эндпоинтов описаны в этом файле
+ */
 func panicRecover(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t := time.Now()
@@ -37,7 +40,7 @@ func authMW(next http.Handler) http.Handler {
 			errorResponse(w, errors.UserNotLogged)
 			return
 		}
-		if Err := hash.CheckTokenBase64Signature(accessToken); Err != nil {
+		if Err := hash.CheckAccessTokenSignature(accessToken); Err != nil {
 			logger.Error(r, Err)
 			errorResponse(w, errors.UserNotLogged)
 			return

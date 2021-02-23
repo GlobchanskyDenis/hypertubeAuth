@@ -52,7 +52,7 @@ func TestProfileGet(t *testing.T) {
 		t.FailNow()
 	}
 
-	token, Err := hash.CreateToken(user1)
+	token, Err := hash.CreateAccessToken(user1)
 	if Err != nil {
 		t.Errorf("%sError: не смог создать тестовый авторизационный токен %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		t.FailNow()

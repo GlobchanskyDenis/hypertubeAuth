@@ -17,6 +17,7 @@ type UserBasicModel struct {
 	Username         string  `json:"username"`
 	IsEmailConfirmed bool    `json:"-"`
 	EmailConfirmHash string  `json:"-"`
+	NewEmail		 *string `json:"-"`
 }
 
 type UserBasic struct {
@@ -41,7 +42,11 @@ type User42 struct {
 	ImageBody   string `json:"-"`
 }
 
-type TokenHeader struct {
+type AccessTokenHeader struct {
+	UserId uint `json:"userId"`
+}
+
+type RepairTokenHeader struct {
 	UserId uint `json:"userId"`
 }
 

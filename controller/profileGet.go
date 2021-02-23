@@ -10,6 +10,13 @@ import (
 	"strconv"
 )
 
+/*
+**	/api/profile/get
+**	Возвращает личные данные пользователя в случае отсутствия параметра id
+**	В случае наличия параметра id - возвращает данные пользователя с данным id
+**	в этом случае приватные поля (email) будут скрыты
+**	-- Проверено
+ */
 func profileGet(w http.ResponseWriter, r *http.Request) {
 	/*
 	**	Получаю токен из заголовка
@@ -21,7 +28,7 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header, Err := hash.GetHeaderFromToken(accessToken)
+	header, Err := hash.GetHeaderFromAccessToken(accessToken)
 	if Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)
@@ -33,7 +40,12 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 	if idString != "" {
 		idInt, err := strconv.Atoi(idString)
 		if err != nil {
-			logger.Warning(r, "Id пользователя ("+idString+") содежит ошибку.")
+			logger.Warning(r, "Id пользователя ("+idString+") содежит ошибку: " + err.Error())
+			errorResponse(w, errors.InvalidRequestBody)
+			return
+		}
+		if idInt < 1 {
+			logger.Warning(r, "Id пользователя ("+idString+") меньше единицы")
 			errorResponse(w, errors.InvalidRequestBody)
 			return
 		}

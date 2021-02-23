@@ -14,8 +14,8 @@ import (
 /*
 **	/api/email/resend
 **	Повторная отправка кода подтверждения почты на почту
+**	-- еще не протестировано !!!!!
  */
-
 func emailResend(w http.ResponseWriter, r *http.Request) {
 	email, Err := parseEmailFromRequest(r)
 	if Err != nil {
@@ -45,14 +45,14 @@ func emailResend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func(user *model.UserBasic, serverPort uint) {
-		if Err := mailer.SendEmailConfirmMessage(user, serverPort); Err != nil {
+	go func(user *model.UserBasic, serverIp string, serverPort uint) {
+		if Err := mailer.SendEmailConfirmMessage(user, serverIp, serverPort); Err != nil {
 			logger.Error(r, Err)
 		} else {
 			logger.Success(r, "Писмьмо для подтверждения почты пользователя #"+
 				logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно отправлено")
 		}
-	}(user, conf.ServerPort)
+	}(user, conf.ServerIp, conf.ServerPort)
 
 	logger.Success(r, "Повторное письмо пользователя #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
 		" обработано и поставлено в очередь на отправку")

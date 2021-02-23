@@ -199,17 +199,24 @@ func UserUpdateBasic(user *model.UserBasic) *errors.Error {
 	if user.Lname != nil {
 		userOld.Lname = user.Lname
 	}
+	if user.EmailConfirmHash != "" {
+		userOld.EmailConfirmHash = user.EmailConfirmHash
+	}
+	if user.NewEmail != nil {
+		userOld.NewEmail = user.NewEmail
+	}
 	user = userOld
 	/*
 	**	Update old user with new fields
 	 */
 	stmt, err := tx.Prepare(`UPDATE users SET image_body=$2, first_name=$3,
-		last_name=$4, username=$5 WHERE user_id = $1`)
+		last_name=$4, username=$5 email_confirm_hash=$6 new_email=$7 WHERE user_id = $1`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
 	defer stmt.Close()
-	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Fname, user.Lname, user.Username)
+	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Fname, user.Lname, user.Username,
+		user.EmailConfirmHash, user.NewEmail)
 	if err != nil {
 		return errors.DatabaseExecutingError.SetOrigin(err)
 	}

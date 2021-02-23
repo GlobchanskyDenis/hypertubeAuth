@@ -29,7 +29,7 @@ func getConfig() (*Config, *errors.Error) {
 	return cfg, nil
 }
 
-func SendEmailConfirmMessage(user *model.UserBasic, serverPort uint) *errors.Error {
+func SendEmailConfirmMessage(user *model.UserBasic, serverIp string, serverPort uint) *errors.Error {
 	conf, Err := getConfig()
 	if Err != nil {
 		return Err
@@ -46,12 +46,78 @@ Content-type: text/html; charset=utf8
 
 <html><head></head><body>
 <span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm your email
-<form method="POST" action="http://localhost:` + portString + `/api/email/confirm">
+<form method="POST" action="http://`+serverIp+`:` + portString + `/api/email/confirm">
 	<input type="hidden" name="code" value="` + user.EmailConfirmHash + `">
 	<input type="submit" value="Click to confirm mail">
 </form>
-<a target="_blank" href="http://localhost:` + portString + `/api/email/confirm?code=` + user.EmailConfirmHash + `">click to confirm mail</a></br> 
+<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/email/confirm?code=` + user.EmailConfirmHash + `">click to confirm mail</a></br> 
  ` + user.EmailConfirmHash + `</br>
+if this letter came by mistake - delete it 
+</span></body></html>
+`
+
+	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{user.Email}, []byte(message)); err != nil {
+		return errors.MailerError.SetOrigin(err)
+	}
+	return nil
+}
+
+func SendEmailPatchMailAddress(user *model.UserBasic, serverIp string, serverPort uint) *errors.Error {
+	conf, Err := getConfig()
+	if Err != nil {
+		return Err
+	}
+
+	portString := strconv.FormatUint(uint64(serverPort), 10)
+
+	auth := smtp.PlainAuth("", conf.Email, conf.Passwd, conf.Host)
+	message := `To: <` + user.Email + `>
+From: "Hypertube administration" <` + conf.Email + `>
+Subject: Confirm new email in project Hypertube
+MIME-Version: 1.0
+Content-type: text/html; charset=utf8
+
+<html><head></head><body>
+<span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm your new email
+<form method="POST" action="http://`+serverIp+`:` + portString + `/api/email/patch/confirm">
+	<input type="hidden" name="code" value="` + user.EmailConfirmHash + `">
+	<input type="submit" value="Click to confirm mail">
+</form>
+<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/email/patch/confirm?code=` + user.EmailConfirmHash + `">click to confirm mail</a></br> 
+ ` + user.EmailConfirmHash + `</br>
+if this letter came by mistake - delete it 
+</span></body></html>
+`
+
+	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{user.Email}, []byte(message)); err != nil {
+		return errors.MailerError.SetOrigin(err)
+	}
+	return nil
+}
+
+func SendEmailPasswdRepair(user *model.UserBasic, repairToken, serverIp string, serverPort uint) *errors.Error {
+	conf, Err := getConfig()
+	if Err != nil {
+		return Err
+	}
+
+	portString := strconv.FormatUint(uint64(serverPort), 10)
+
+	auth := smtp.PlainAuth("", conf.Email, conf.Passwd, conf.Host)
+	message := `To: <` + user.Email + `>
+From: "Hypertube administration" <` + conf.Email + `>
+Subject: Password repair in project Hypertube
+MIME-Version: 1.0
+Content-type: text/html; charset=utf8
+
+<html><head></head><body>
+<span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm password repair of your account
+<form method="POST" action="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm">
+	<input type="hidden" name="repairToken" value="` + repairToken + `">
+	<input type="submit" value="Click to confirm mail">
+</form>
+<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm?repairToken=` + repairToken +
+	`">click to repair password</a></br></br>
 if this letter came by mistake - delete it 
 </span></body></html>
 `

@@ -14,8 +14,9 @@ import (
 
 /*
 **	/api/profile/create
+**	Базовая регистрация пользователя
+**	-- Проверено
  */
-
 func profileCreate(w http.ResponseWriter, r *http.Request) {
 	user, Err := parseUserBasicFromRequest(r)
 	if Err != nil {
@@ -55,14 +56,14 @@ func profileCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func(user *model.UserBasic, serverPort uint) {
-		if Err := mailer.SendEmailConfirmMessage(user, serverPort); Err != nil {
+	go func(user *model.UserBasic, serverIp string, serverPort uint) {
+		if Err := mailer.SendEmailConfirmMessage(user, serverIp, serverPort); Err != nil {
 			logger.Error(r, Err)
 		} else {
 			logger.Success(r, "Писмьмо для подтверждения почты пользователя #"+
 				logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно отправлено")
 		}
-	}(user, conf.ServerPort)
+	}(user, conf.ServerIp, conf.ServerPort)
 
 	userJson, err := json.Marshal(user)
 	if err != nil {

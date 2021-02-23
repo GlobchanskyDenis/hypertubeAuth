@@ -5,7 +5,9 @@ import (
 )
 
 type Config struct {
+	ProjectRoot         string `conf:"projectRoot"`
 	ServerPasswd        string `conf:"passwd"`
+	ServerIp            string `conf:"ip"`
 	ServerPort          uint   `conf:"port"`
 	SocketRedirect      string `conf:"socketRedirect"`
 	OauthRedirect       string `conf:"oauthRedirect"`
