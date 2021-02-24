@@ -62,14 +62,14 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.EmailConfirmHash != confirmCode {
-		logger.Warning(r, "Хэш подтверждения почты не совпал. Ожидалось "+user.EmailConfirmHash+" получено "+confirmCode)
-		Err := errors.ImpossibleToExecute.SetArgs("неверный код подтверждения", "confirm code is wrong")
-		http.Redirect(w, r,
-			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
-			http.StatusTemporaryRedirect)
-		return
-	}
+	// if user.EmailConfirmHash != confirmCode {
+	// 	logger.Warning(r, "Хэш подтверждения почты не совпал. Ожидалось "+user.EmailConfirmHash+" получено "+confirmCode)
+	// 	Err := errors.ImpossibleToExecute.SetArgs("неверный код подтверждения", "confirm code is wrong")
+	// 	http.Redirect(w, r,
+	// 		conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
+	// 		http.StatusTemporaryRedirect)
+	// 	return
+	// }
 
 	if Err = postgres.UserConfirmEmailBasic(user); Err != nil {
 		logger.Error(r, Err)

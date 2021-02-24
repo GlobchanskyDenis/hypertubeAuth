@@ -77,35 +77,6 @@ func UserSet42(user *model.User42) (*model.UserBasic, *errors.Error) {
 	return userBasic, nil
 }
 
-// func UserDelete42(user *model.User42) *errors.Error {
-// 	if
-// 	conn, Err := getConnection()
-// 	if Err != nil {
-// 		return Err
-// 	}
-// 	stmt, err := conn.db.Prepare(`DELETE FROM users_42_strategy WHERE user_id = $1`)
-// 	if err != nil {
-// 		return errors.DatabasePreparingError.SetOrigin(err)
-// 	}
-// 	result, err := stmt.Exec(user.UserId)
-// 	if err != nil {
-// 		return errors.DatabaseExecutingError.SetOrigin(err)
-// 	}
-// 	// handle results
-// 	nbr64, err := result.RowsAffected()
-// 	if err != nil {
-// 		return errors.DatabaseExecutingError.SetOrigin(err)
-// 	}
-// 	if int(nbr64) == 0 {
-// 		return errors.ImpossibleToExecute.SetArgs("Пользователь не найден", "User not found")
-// 	}
-// 	if int(nbr64) > 1 {
-// 		return errors.DatabaseExecutingError.SetArgs("удалено "+strconv.Itoa(int(nbr64))+" пользователя",
-// 			strconv.Itoa(int(nbr64))+" users was deleted")
-// 	}
-// 	return nil
-// }
-
 func UserGet42ById(user42Id uint) (*model.User42, *errors.Error) {
 	conn, Err := getConnection()
 	if Err != nil {

@@ -72,7 +72,6 @@ func CreateUsersTable() *errors.Error {
 		"last_name VARCHAR DEFAULT NULL, " +
 		"username VARCHAR NOT NULL, " +
 		"is_email_confirmed BOOL NOT NULL DEFAULT false, " +
-		"email_confirm_hash VARCHAR NOT NULL DEFAULT '', " +
 		"new_email VARCHAR NULL)"); err != nil {
 		return errors.DatabaseError.SetArgs("11", "11").SetOrigin(err)
 	}

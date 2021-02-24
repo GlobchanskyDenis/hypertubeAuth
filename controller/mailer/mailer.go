@@ -29,7 +29,7 @@ func getConfig() (*Config, *errors.Error) {
 	return cfg, nil
 }
 
-func SendEmailConfirmMessage(user *model.UserBasic, serverIp string, serverPort uint) *errors.Error {
+func SendEmailConfirmMessage(user *model.UserBasic, token, serverIp string, serverPort uint) *errors.Error {
 	conf, Err := getConfig()
 	if Err != nil {
 		return Err
@@ -47,11 +47,11 @@ Content-type: text/html; charset=utf8
 <html><head></head><body>
 <span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm your email
 <form method="POST" action="http://`+serverIp+`:` + portString + `/api/email/confirm">
-	<input type="hidden" name="code" value="` + user.EmailConfirmHash + `">
+	<input type="hidden" name="code" value="` + token + `">
 	<input type="submit" value="Click to confirm mail">
 </form>
-<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/email/confirm?code=` + user.EmailConfirmHash + `">click to confirm mail</a></br> 
- ` + user.EmailConfirmHash + `</br>
+<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/email/confirm?code=` + token + `">click to confirm mail</a></br>
+</br>
 if this letter came by mistake - delete it 
 </span></body></html>
 `
@@ -88,6 +88,7 @@ Content-type: text/html; charset=utf8
 	<input type="submit" value="Click to confirm mail">
 </form>
 <a target="_blank" href="http://`+serverIp+`:` + portString + `/api/email/patch/confirm?code=` + token + `">click to confirm mail</a></br>
+</br>
 if this letter came by mistake - delete it 
 </span></body></html>
 `
@@ -121,6 +122,7 @@ Content-type: text/html; charset=utf8
 </form>
 <a target="_blank" href="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm?repairToken=` + repairToken +
 	`">click to repair password</a></br></br>
+</br>
 if this letter came by mistake - delete it 
 </span></body></html>
 `

@@ -12,7 +12,6 @@ var (
 	emailValid2      = "user2@gmail.com"
 	encryptedPass    = "WQEsafqwesa="
 	username         = "USER"
-	emailConfirmHash = "emailConfirmHash"
 )
 
 func initTest(t *testing.T) {

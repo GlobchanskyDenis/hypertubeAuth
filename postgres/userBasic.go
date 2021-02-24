@@ -13,14 +13,13 @@ func UserSetBasic(user *model.UserBasic) *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	stmt, err := conn.db.Prepare(`INSERT INTO users (email, encryptedpass, username, email_confirm_hash)
+	stmt, err := conn.db.Prepare(`INSERT INTO users (email, encryptedpass, username, new_email)
 		VALUES ($1, $2, $3, $4) RETURNING user_id`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
 	defer stmt.Close()
-	if err = stmt.QueryRow(user.Email, user.EncryptedPass, user.Username,
-		user.EmailConfirmHash).Scan(&user.UserId); err != nil {
+	if err = stmt.QueryRow(user.Email, user.EncryptedPass, user.Username, user.NewEmail).Scan(&user.UserId); err != nil {
 		if strings.Contains(err.Error(), `users_email_key`) {
 			return errors.ImpossibleToExecute.SetArgs("Эта почта уже закреплена за другим пользователем",
 				"This email is already assigned to another user")
@@ -79,7 +78,7 @@ func UserGetBasicById(userId uint) (*model.UserBasic, *errors.Error) {
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash, &user.NewEmail); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -101,7 +100,7 @@ func UserGetBasicByIdTx(tx *sql.Tx, userId uint) (*model.UserBasic, *errors.Erro
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash, &user.NewEmail); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -127,7 +126,7 @@ func UserGetBasicByEmail(email string) (*model.UserBasic, *errors.Error) {
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash, &user.NewEmail); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -199,9 +198,6 @@ func UserUpdateBasic(user *model.UserBasic) *errors.Error {
 	if user.Lname != nil {
 		userOld.Lname = user.Lname
 	}
-	if user.EmailConfirmHash != "" {
-		userOld.EmailConfirmHash = user.EmailConfirmHash
-	}
 	if user.NewEmail != nil {
 		userOld.NewEmail = user.NewEmail
 	}
@@ -210,13 +206,12 @@ func UserUpdateBasic(user *model.UserBasic) *errors.Error {
 	**	Update old user with new fields
 	 */
 	stmt, err := tx.Prepare(`UPDATE users SET image_body=$2, first_name=$3,
-		last_name=$4, username=$5, email_confirm_hash=$6, new_email=$7 WHERE user_id = $1`)
+		last_name=$4, username=$5, new_email=$6 WHERE user_id = $1`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
 	defer stmt.Close()
-	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Fname, user.Lname, user.Username,
-		user.EmailConfirmHash, user.NewEmail)
+	result, err := stmt.Exec(user.UserId, user.ImageBody, user.Fname, user.Lname, user.Username, user.NewEmail)
 	if err != nil {
 		return errors.DatabaseExecutingError.SetOrigin(err)
 	}

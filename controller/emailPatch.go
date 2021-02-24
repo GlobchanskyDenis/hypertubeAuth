@@ -49,12 +49,12 @@ func emailPatch(w http.ResponseWriter, r *http.Request) {
 
 	user.NewEmail = &newEmail
 
-	user.EmailConfirmHash, Err = hash.EmailHashEncode(newEmail)
-	if Err != nil {
-		logger.Warning(r, "cannot get password hash - "+Err.Error())
-		errorResponse(w, Err)
-		return
-	}
+	// user.EmailConfirmHash, Err = hash.EmailHashEncode(newEmail)
+	// if Err != nil {
+	// 	logger.Warning(r, "cannot get password hash - "+Err.Error())
+	// 	errorResponse(w, Err)
+	// 	return
+	// }
 
 	emailPatchToken, Err := hash.CreateEmailToken(user)
 	if Err != nil {

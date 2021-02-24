@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"HypertubeAuth/controller/hash"
 	"HypertubeAuth/controller/mailer"
 	"HypertubeAuth/errors"
 	"HypertubeAuth/logger"
@@ -14,6 +15,8 @@ import (
 /*
 **	/api/email/resend
 **	Повторная отправка кода подтверждения почты на почту
+**	Пользователь не залогинен (так как для этого нужно сначала подтвердить почту).
+**	Письмо отсылается только в случае если пользователь еще не подтвердил почту.
 **	-- еще не протестировано !!!!!
  */
 func emailResend(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +41,13 @@ func emailResend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	emailToken, Err := hash.CreateEmailToken(user)
+	if Err != nil {
+		logger.Error(r, Err)
+		errorResponse(w, Err)
+		return
+	}
+
 	conf, Err := getConfig()
 	if Err != nil {
 		logger.Error(r, Err)
@@ -45,14 +55,14 @@ func emailResend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func(user *model.UserBasic, serverIp string, serverPort uint) {
-		if Err := mailer.SendEmailConfirmMessage(user, serverIp, serverPort); Err != nil {
+	go func(user *model.UserBasic, emailToken, serverIp string, serverPort uint) {
+		if Err := mailer.SendEmailConfirmMessage(user, emailToken, serverIp, serverPort); Err != nil {
 			logger.Error(r, Err)
 		} else {
 			logger.Success(r, "Писмьмо для подтверждения почты пользователя #"+
 				logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно отправлено")
 		}
-	}(user, conf.ServerIp, conf.ServerPort)
+	}(user, emailToken, conf.ServerIp, conf.ServerPort)
 
 	logger.Success(r, "Повторное письмо пользователя #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
 		" обработано и поставлено в очередь на отправку")

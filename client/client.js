@@ -192,9 +192,41 @@ function EmailPatch() {
 		}
 		document.getElementById("errorField").innerHTML = ""
 		document.getElementById("responseField").innerHTML = "email to confirm patch was sent"
-		document.forms['profilePatch']['firstName'].value = "";
-		document.forms['profilePatch']['lastName'].value = "";
-		document.forms['profilePatch']['username'].value = "";
+		document.forms['emailPatch']['email'].value = "";
+	}
+	xhr.onerror = function () {
+		console.log("onError event")
+	}
+}
+
+function EmailResend() {
+	var email = document.forms['emailPatch']['email'].value;
+	var user = {};
+	if (email != "") {
+		user.email = email;
+	}
+	var request = JSON.stringify(user)
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "http://"+serverIP+":"+serverPort+"/api/email/resend");
+	xhr.setRequestHeader("accessToken", document.token)
+	console.log("tx: " + request)
+	xhr.send(request);
+	xhr.onload = function () {
+		if (xhr.response) {
+			var requestAsync = JSON.parse(xhr.response);
+		} else {
+			var requestAsync = "";
+		}
+		console.log("rx: " + xhr.status + " : " + xhr.response);
+		if (xhr.status != 200) {
+			document.getElementById("errorField").innerHTML = "Что-то пошло не так: " + xhr.status + " : "
+			document.getElementById("errorField").innerHTML += ((requestAsync.error) ? requestAsync.error : xhr.statusText)
+			document.getElementById("responseField").innerHTML = "";
+			return
+		}
+		document.getElementById("errorField").innerHTML = ""
+		document.getElementById("responseField").innerHTML = "email to confirm patch was sent"
+		document.forms['emailPatch']['email'].value = "";
 	}
 	xhr.onerror = function () {
 		console.log("onError event")

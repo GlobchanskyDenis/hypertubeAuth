@@ -34,10 +34,6 @@ func TestAuthBasic(t *testing.T) {
 		t.FailNow()
 	}
 	user.Username = "displayname"
-	if user.EmailConfirmHash, Err = hash.EmailHashEncode(user.Email); Err != nil {
-		t.Errorf("%sError: не смог создать хэш почты %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
-		t.FailNow()
-	}
 
 	if Err = postgres.UserSetBasic(user); Err != nil {
 		t.Errorf("%sError: не смог создать тестового юзера %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)

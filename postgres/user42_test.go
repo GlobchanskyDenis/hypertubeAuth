@@ -6,7 +6,6 @@ import (
 	"HypertubeAuth/model"
 	"testing"
 	"time"
-	// "fmt"
 )
 
 func TestSetUser42(t *testing.T) {
@@ -97,7 +96,7 @@ func TestSetUser42(t *testing.T) {
 	})
 
 	t.Run("valid get user #1 by user id", func(t_ *testing.T) {
-		newUser, Err := UserGet42ById(user1.UserId)
+		newUser, Err := UserGet42ById(user1.User42Id)
 		if Err != nil {
 			t_.Errorf("%sError: %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		} else if user1.UserId != newUser.UserId || newUser.AccessToken == nil ||

@@ -37,11 +37,7 @@ func profileCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.EmailConfirmHash, Err = hash.EmailHashEncode(user.Email); Err != nil {
-		logger.Error(r, Err)
-		errorResponse(w, Err)
-		return
-	}
+	user.NewEmail = &user.Email
 
 	if Err = postgres.UserSetBasic(user); Err != nil {
 		logger.Error(r, Err)
@@ -56,14 +52,21 @@ func profileCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func(user *model.UserBasic, serverIp string, serverPort uint) {
-		if Err := mailer.SendEmailConfirmMessage(user, serverIp, serverPort); Err != nil {
+	emailToken, Err := hash.CreateEmailToken(user)
+	if Err != nil {
+		logger.Error(r, Err)
+		errorResponse(w, Err)
+		return
+	}
+
+	go func(user *model.UserBasic, emailToken, serverIp string, serverPort uint) {
+		if Err := mailer.SendEmailConfirmMessage(user, emailToken, serverIp, serverPort); Err != nil {
 			logger.Error(r, Err)
 		} else {
 			logger.Success(r, "Писмьмо для подтверждения почты пользователя #"+
 				logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно отправлено")
 		}
-	}(user, conf.ServerIp, conf.ServerPort)
+	}(user, emailToken, conf.ServerIp, conf.ServerPort)
 
 	userJson, err := json.Marshal(user)
 	if err != nil {

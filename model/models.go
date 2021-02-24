@@ -16,7 +16,6 @@ type UserBasicModel struct {
 	Lname            *string `json:"lastName"`
 	Username         string  `json:"username"`
 	IsEmailConfirmed bool    `json:"-"`
-	EmailConfirmHash string  `json:"-"`
 	NewEmail		 *string `json:"-"`
 }
 
