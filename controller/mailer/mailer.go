@@ -62,16 +62,20 @@ if this letter came by mistake - delete it
 	return nil
 }
 
-func SendEmailPatchMailAddress(user *model.UserBasic, serverIp string, serverPort uint) *errors.Error {
+func SendEmailPatchMailAddress(user *model.UserBasic, token, serverIp string, serverPort uint) *errors.Error {
 	conf, Err := getConfig()
 	if Err != nil {
 		return Err
 	}
 
+	if user.NewEmail == nil {
+		return errors.MailerError.SetArgs("Поле NewEmail равно nil", "NewEmail field is nil")
+	}
+
 	portString := strconv.FormatUint(uint64(serverPort), 10)
 
 	auth := smtp.PlainAuth("", conf.Email, conf.Passwd, conf.Host)
-	message := `To: <` + user.Email + `>
+	message := `To: <` + *user.NewEmail + `>
 From: "Hypertube administration" <` + conf.Email + `>
 Subject: Confirm new email in project Hypertube
 MIME-Version: 1.0
@@ -80,16 +84,15 @@ Content-type: text/html; charset=utf8
 <html><head></head><body>
 <span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm your new email
 <form method="POST" action="http://`+serverIp+`:` + portString + `/api/email/patch/confirm">
-	<input type="hidden" name="code" value="` + user.EmailConfirmHash + `">
+	<input type="hidden" name="code" value="` + token + `">
 	<input type="submit" value="Click to confirm mail">
 </form>
-<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/email/patch/confirm?code=` + user.EmailConfirmHash + `">click to confirm mail</a></br> 
- ` + user.EmailConfirmHash + `</br>
+<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/email/patch/confirm?code=` + token + `">click to confirm mail</a></br>
 if this letter came by mistake - delete it 
 </span></body></html>
 `
 
-	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{user.Email}, []byte(message)); err != nil {
+	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{*user.NewEmail}, []byte(message)); err != nil {
 		return errors.MailerError.SetOrigin(err)
 	}
 	return nil

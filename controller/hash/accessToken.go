@@ -26,12 +26,12 @@ func createAccessTokenSignature(headerBase64 string) (string, *errors.Error) {
 /*
 **	Проверка подписи токена доступа (когда он уже частично раскодирован)
  */
-func checkAccessTokenPartsSignature(header, origSignature string) *errors.Error {
-	signature, Err := createAccessTokenSignature(header)
+func checkAccessTokenPartsSignature(headerBase64, origSignatureBase64 string) *errors.Error {
+	signatureBase64, Err := createAccessTokenSignature(headerBase64)
 	if Err != nil {
 		return Err
 	}
-	if signature != origSignature {
+	if signatureBase64 != origSignatureBase64 {
 		return errors.InvalidToken.SetHidden("подпись содержит ошибку")
 	}
 	return nil

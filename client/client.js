@@ -32,16 +32,16 @@ function AuthBasic() {
 			return
 		}
 		document.getElementById("errorField").innerHTML = ""
-		if (!requestAsync.access_token) {
+		if (!requestAsync.accessToken) {
 			document.getElementById("errorField").innerHTML += "access token is empty. Its not a valid case";
 			return
 		}
-		document.getElementById("responseField").innerHTML = "access_token=hidden"
-		console.log("rx token: " + requestAsync["access_token"]);
+		document.getElementById("responseField").innerHTML = "accessToken=hidden"
+		console.log("rx accessToken: " + requestAsync["accessToken"]);
 		console.log("rx user profile: " + requestAsync["profile"]);
 		document.forms['authBasic']['email'].value = "";
 		document.forms['authBasic']['passwd'].value = "";
-		document.token = requestAsync["access_token"]
+		document.token = requestAsync["accessToken"]
 	}
 	xhr.onerror = function () {
 		console.log("onError event")
@@ -156,6 +156,42 @@ function ProfilePatch() {
 		}
 		document.getElementById("errorField").innerHTML = ""
 		document.getElementById("responseField").innerHTML = "user profile was patched"
+		document.forms['profilePatch']['firstName'].value = "";
+		document.forms['profilePatch']['lastName'].value = "";
+		document.forms['profilePatch']['username'].value = "";
+	}
+	xhr.onerror = function () {
+		console.log("onError event")
+	}
+}
+
+function EmailPatch() {
+	var email = document.forms['emailPatch']['email'].value;
+	var user = {};
+	if (email != "") {
+		user.email = email;
+	}
+	var request = JSON.stringify(user)
+	let xhr = new XMLHttpRequest();
+	xhr.open("PATCH", "http://"+serverIP+":"+serverPort+"/api/email/patch");
+	xhr.setRequestHeader("accessToken", document.token)
+	console.log("tx: " + request)
+	xhr.send(request);
+	xhr.onload = function () {
+		if (xhr.response) {
+			var requestAsync = JSON.parse(xhr.response);
+		} else {
+			var requestAsync = "";
+		}
+		console.log("rx: " + xhr.status + " : " + xhr.response);
+		if (xhr.status != 200) {
+			document.getElementById("errorField").innerHTML = "Что-то пошло не так: " + xhr.status + " : "
+			document.getElementById("errorField").innerHTML += ((requestAsync.error) ? requestAsync.error : xhr.statusText)
+			document.getElementById("responseField").innerHTML = "";
+			return
+		}
+		document.getElementById("errorField").innerHTML = ""
+		document.getElementById("responseField").innerHTML = "email to confirm patch was sent"
 		document.forms['profilePatch']['firstName'].value = "";
 		document.forms['profilePatch']['lastName'].value = "";
 		document.forms['profilePatch']['username'].value = "";

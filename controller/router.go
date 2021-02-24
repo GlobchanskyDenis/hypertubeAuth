@@ -33,13 +33,15 @@ func Router() http.Handler {
 	mux.Handle("/api/email/resend", corsPost(http.HandlerFunc(emailResend)))
 	// mux.Handle("/api/passwd/repair", corsPost(http.HandlerFunc(passwdRepair))) ///
 	mux.Handle("/api/email/confirm", corsGetPost(http.HandlerFunc(emailConfirm)))
+	mux.Handle("/api/email/patch/confirm", corsGetPost(http.HandlerFunc(emailPatchConfirm)))
 
 	// PUT
 	mux.Handle("/api/profile/create", corsPut(http.HandlerFunc(profileCreate)))
 
 	// PATCH
-	mux.Handle("/api/profile/patch", corsPatch(authMW(http.HandlerFunc(profilePatch))))
+	mux.Handle("/api/email/patch", corsPatch(authMW(http.HandlerFunc(emailPatch))))
 	mux.Handle("/api/passwd/patch", corsPatch(authMW(http.HandlerFunc(passwdPatch))))
+	mux.Handle("/api/profile/patch", corsPatch(authMW(http.HandlerFunc(profilePatch))))
 
 	// DELETE
 	mux.Handle("/api/profile/delete", corsDelete(authMW(http.HandlerFunc(profileDelete))))

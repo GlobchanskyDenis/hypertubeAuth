@@ -50,6 +50,11 @@ type RepairTokenHeader struct {
 	UserId uint `json:"userId"`
 }
 
+type EmailTokenHeader struct {
+	UserId   uint   `json:"userId"`
+	NewEmail string `json:"newEmail"`
+}
+
 type Token struct {
 	ServerPasswd string `json:"serverPasswd,omitempty"`
 	AccessToken  string `json:"accessToken"`

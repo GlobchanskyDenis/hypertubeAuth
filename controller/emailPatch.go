@@ -3,6 +3,7 @@ package controller
 import (
 	"HypertubeAuth/controller/hash"
 	"HypertubeAuth/controller/mailer"
+	"HypertubeAuth/errors"
 	"HypertubeAuth/logger"
 	"HypertubeAuth/model"
 	"HypertubeAuth/postgres"
@@ -15,28 +16,49 @@ import (
 **	изменение почты. Отправляет письмо для подтверждения на новую почту
 **	Первый эндпоинт из двух. Первый дергает пользователь с сайта,
 **	второй - с почты для подтверждения
-**	-- еще не оттестировано !!!!!!!
+**	-- Проверено
  */
 func emailPatch(w http.ResponseWriter, r *http.Request) {
-	email, Err := parseEmailFromRequest(r)
+	newEmail, Err := parseEmailFromRequest(r)
 	if Err != nil {
 		logger.Warning(r, Err.Error())
 		errorResponse(w, Err)
 		return
 	}
 
-	user, Err := postgres.UserGetBasicByEmail(email)
+	accessToken := r.Header.Get("accessToken")
+	if accessToken == "" {
+		logger.Error(r, errors.UserNotLogged.SetArgs("отсутствует токен доступа", "access token expected"))
+		errorResponse(w, errors.UserNotLogged)
+		return
+	}
+
+	accessHeader, Err := hash.GetHeaderFromAccessToken(accessToken)
 	if Err != nil {
 		logger.Error(r, Err)
 		errorResponse(w, Err)
 		return
 	}
 
-	user.NewEmail = &email
+	user, Err := postgres.UserGetBasicById(accessHeader.UserId)
+	if Err != nil {
+		logger.Error(r, Err)
+		errorResponse(w, Err)
+		return
+	}
 
-	user.EmailConfirmHash, Err = hash.EmailHashEncode(email)
+	user.NewEmail = &newEmail
+
+	user.EmailConfirmHash, Err = hash.EmailHashEncode(newEmail)
 	if Err != nil {
 		logger.Warning(r, "cannot get password hash - "+Err.Error())
+		errorResponse(w, Err)
+		return
+	}
+
+	emailPatchToken, Err := hash.CreateEmailToken(user)
+	if Err != nil {
+		logger.Error(r, Err)
 		errorResponse(w, Err)
 		return
 	}
@@ -54,16 +76,16 @@ func emailPatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func(user *model.UserBasic, serverIp string, serverPort uint) {
-		if Err := mailer.SendEmailPatchMailAddress(user, serverIp, serverPort); Err != nil {
+	go func(user *model.UserBasic, emailPatchToken, serverIp string, serverPort uint) {
+		if Err := mailer.SendEmailPatchMailAddress(user, emailPatchToken, serverIp, serverPort); Err != nil {
 			logger.Error(r, Err)
 		} else {
 			logger.Success(r, "Писмьмо для подтверждения новой почты пользователя #"+
 				logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно отправлено")
 		}
-	}(user, conf.ServerIp, conf.ServerPort)
+	}(user, emailPatchToken, conf.ServerIp, conf.ServerPort)
 
 	successResponse(w, nil)
 	logger.Success(r, "Пользователь #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
-		" подал успешную заявку на изменение почтового адреса")
+		" подал успешную заявку на изменение почтового адреса "+logger.BLUE+newEmail+logger.NO_COLOR)
 }

@@ -79,7 +79,7 @@ func UserGetBasicById(userId uint) (*model.UserBasic, *errors.Error) {
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -101,7 +101,7 @@ func UserGetBasicByIdTx(tx *sql.Tx, userId uint) (*model.UserBasic, *errors.Erro
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -127,7 +127,7 @@ func UserGetBasicByEmail(email string) (*model.UserBasic, *errors.Error) {
 	}
 	var user = &model.UserBasic{}
 	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
-		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash); err != nil {
+		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.EmailConfirmHash, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
 	return user, nil
@@ -139,12 +139,12 @@ func UserConfirmEmailBasic(user *model.UserBasic) *errors.Error {
 		return Err
 	}
 
-	stmt, err := conn.db.Prepare(`UPDATE users SET is_email_confirmed = true WHERE user_id = $1`)
+	stmt, err := conn.db.Prepare(`UPDATE users SET email=$2, is_email_confirmed=TRUE, new_email=NULL WHERE user_id=$1`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
 	defer stmt.Close()
-	result, err := stmt.Exec(user.UserId)
+	result, err := stmt.Exec(user.UserId, user.Email)
 	if err != nil {
 		return errors.DatabaseExecutingError.SetOrigin(err)
 	}
@@ -210,7 +210,7 @@ func UserUpdateBasic(user *model.UserBasic) *errors.Error {
 	**	Update old user with new fields
 	 */
 	stmt, err := tx.Prepare(`UPDATE users SET image_body=$2, first_name=$3,
-		last_name=$4, username=$5 email_confirm_hash=$6 new_email=$7 WHERE user_id = $1`)
+		last_name=$4, username=$5, email_confirm_hash=$6, new_email=$7 WHERE user_id = $1`)
 	if err != nil {
 		return errors.DatabasePreparingError.SetOrigin(err)
 	}
