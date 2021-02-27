@@ -31,7 +31,7 @@ func Router() http.Handler {
 	// POST
 	mux.Handle("/api/auth/check", corsPost(http.HandlerFunc(authCheck)))
 	mux.Handle("/api/email/resend", corsPost(http.HandlerFunc(emailResend)))
-	// mux.Handle("/api/passwd/repair", corsPost(http.HandlerFunc(passwdRepair))) ///
+	mux.Handle("/api/passwd/repair", corsPost(http.HandlerFunc(passwdRepair))) ///
 	mux.Handle("/api/email/confirm", corsGetPost(http.HandlerFunc(emailConfirm)))
 	mux.Handle("/api/email/patch/confirm", corsGetPost(http.HandlerFunc(emailPatchConfirm)))
 

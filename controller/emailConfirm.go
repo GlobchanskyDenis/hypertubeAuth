@@ -26,7 +26,7 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	confirmCode, Err := parseCodeFromRequest(r)
+	emailToken, Err := parseCodeFromRequest(r)
 	if Err != nil {
 		logger.Error(r, Err)
 		http.Redirect(w, r,
@@ -35,7 +35,7 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email, Err := hash.EmailHashDecode(confirmCode)
+	tokenHeader, Err := hash.GetHeaderFromEmailToken(emailToken)
 	if Err != nil {
 		logger.Error(r, Err)
 		http.Redirect(w, r,
@@ -44,7 +44,7 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, Err := postgres.UserGetBasicByEmail(email)
+	user, Err := postgres.UserGetBasicByEmail(tokenHeader.NewEmail)
 	if Err != nil {
 		logger.Error(r, Err)
 		http.Redirect(w, r,
