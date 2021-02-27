@@ -89,7 +89,7 @@ func corsPost(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "POST,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken,repairToken")
 
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
@@ -107,7 +107,7 @@ func corsPatch(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "PATCH,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,accessToken,repairToken")
 
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
@@ -125,7 +125,7 @@ func corsGet(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Methods", "GET,OPTIONS")
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,Authorization,accessToken")
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,Content-Length,Authorization,accessToken,repairToken")
 		if r.Method == "OPTIONS" {
 			logger.Log(r, "client wants to know what methods are allowed")
 			return

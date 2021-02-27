@@ -14,8 +14,7 @@ import (
 **	/api/passwd/repair
 **	восстановление пароля в случае его утраты. Первый эндпоинт (из трех)
 **	остальные - /api/passwd/repair/confirm /api/passwd/repair/patch
-**	-- Не протестировано
-**	-- отсутствуют последующие эндпоинты
+**	-- Проверено
  */
 func passwdRepair(w http.ResponseWriter, r *http.Request) {
 	email, Err := parseEmailFromRequest(r)

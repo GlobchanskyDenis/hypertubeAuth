@@ -61,15 +61,6 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if user.EmailConfirmHash != confirmCode {
-	// 	logger.Warning(r, "Хэш подтверждения почты не совпал. Ожидалось "+user.EmailConfirmHash+" получено "+confirmCode)
-	// 	Err := errors.ImpossibleToExecute.SetArgs("неверный код подтверждения", "confirm code is wrong")
-	// 	http.Redirect(w, r,
-	// 		conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
-	// 		http.StatusTemporaryRedirect)
-	// 	return
-	// }
-
 	if Err = postgres.UserConfirmEmailBasic(user); Err != nil {
 		logger.Error(r, Err)
 		http.Redirect(w, r,
@@ -81,7 +72,7 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 	logger.Success(r, "Пользователь #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
 		" подтвердил свой почтовый адрес "+logger.BLUE+user.Email+logger.NO_COLOR)
 	http.Redirect(w, r,
-		conf.SocketRedirect+conf.ErrorRedirect,
+		conf.SocketRedirect+conf.ErrorRedirect, // ErrorRedirect -  это страница авторизации
 		http.StatusTemporaryRedirect)
 }
 

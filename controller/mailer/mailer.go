@@ -117,10 +117,10 @@ Content-type: text/html; charset=utf8
 <html><head></head><body>
 <span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm password repair of your account
 <form method="GET" action="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm">
-	<input type="hidden" name="repairToken" value="` + repairToken + `">
+	<input type="hidden" name="code" value="` + repairToken + `">
 	<input type="submit" value="Click to confirm mail">
 </form>
-<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm?repairToken=` + repairToken +
+<a target="_blank" href="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm?code=` + repairToken +
 	`">click to repair password</a></br></br>
 </br>
 if this letter came by mistake - delete it 
