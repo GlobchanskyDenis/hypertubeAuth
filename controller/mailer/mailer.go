@@ -83,7 +83,7 @@ Content-type: text/html; charset=utf8
 
 <html><head></head><body>
 <span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm your new email
-<form method="POST" action="http://`+serverIp+`:` + portString + `/api/email/patch/confirm">
+<form method="GET" action="http://`+serverIp+`:` + portString + `/api/email/patch/confirm">
 	<input type="hidden" name="code" value="` + token + `">
 	<input type="submit" value="Click to confirm mail">
 </form>
@@ -116,7 +116,7 @@ Content-type: text/html; charset=utf8
 
 <html><head></head><body>
 <span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm password repair of your account
-<form method="POST" action="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm">
+<form method="GET" action="http://`+serverIp+`:` + portString + `/api/passwd/repair/confirm">
 	<input type="hidden" name="repairToken" value="` + repairToken + `">
 	<input type="submit" value="Click to confirm mail">
 </form>

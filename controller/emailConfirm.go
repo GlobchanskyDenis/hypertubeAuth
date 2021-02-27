@@ -5,7 +5,6 @@ import (
 	"HypertubeAuth/errors"
 	"HypertubeAuth/logger"
 	"HypertubeAuth/postgres"
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"strconv"
