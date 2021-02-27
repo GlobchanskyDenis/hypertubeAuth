@@ -46,7 +46,7 @@ Content-type: text/html; charset=utf8
 
 <html><head></head><body>
 <span style="font-size: 1.3em; color: green;">Hello, ` + user.Username + `, click below to confirm your email
-<form method="POST" action="http://`+serverIp+`:` + portString + `/api/email/confirm">
+<form method="GET" action="http://`+serverIp+`:` + portString + `/api/email/confirm">
 	<input type="hidden" name="code" value="` + token + `">
 	<input type="submit" value="Click to confirm mail">
 </form>

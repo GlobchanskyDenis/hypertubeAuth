@@ -88,24 +88,8 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 
 func parseCodeFromRequest(r *http.Request) (string, *errors.Error) {
 	var confirmCode = r.FormValue("code")
-	if confirmCode != "" {
-		return confirmCode, nil
-	}
-
-	if r.Body == nil {
-		return "", errors.NoArgument.SetArgs("Отсутствует код подтверждения",
-			"confirm code expected").SetHidden("Тело запроса пустое")
-	}
-
-	type Request struct {
-		Code *string `json:"code"`
-	}
-	var request Request
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		return "", errors.InvalidRequestBody.SetOrigin(err)
-	}
-	if request.Code == nil || *request.Code == "" {
+	if confirmCode == "" {
 		return "", errors.NoArgument.SetArgs("Отсутствует код подтверждения", "confirm code expected")
 	}
-	return *request.Code, nil
+	return confirmCode, nil
 }

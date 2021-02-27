@@ -313,3 +313,39 @@ function PasswdRepair() {
 		console.log("onError event")
 	}
 }
+
+function PasswdPatch() {
+	var oldPasswd = document.forms['passwd']['oldPasswd'].value;
+	var newPasswd = document.forms['passwd']['newPasswd'].value;
+	var user = {};
+	if (passwd != "") {
+		user.passwd = oldPasswd;
+	}
+	var request = JSON.stringify(user)
+	let xhr = new XMLHttpRequest();
+	xhr.open("DELETE", "http://"+serverIP+":"+serverPort+"/api/profile/delete");
+	xhr.setRequestHeader("accessToken", document.token)
+	console.log("tx: " + request)
+	xhr.send(request);
+	xhr.onload = function () {
+		if (xhr.response) {
+			var requestAsync = JSON.parse(xhr.response);
+		} else {
+			var requestAsync = "";
+		}
+		console.log("rx: " + xhr.status + " : " + xhr.response);
+		if (xhr.status != 200) {
+			document.getElementById("errorField").innerHTML = "Что-то пошло не так: " + xhr.status + " : "
+			document.getElementById("errorField").innerHTML += ((requestAsync.error) ? requestAsync.error : xhr.statusText)
+			document.getElementById("responseField").innerHTML = "";
+			return
+		}
+		document.getElementById("errorField").innerHTML = ""
+		document.getElementById("responseField").innerHTML = "profile was successfully deleted"
+		document.forms['passwd']['oldPasswd'].value = "";
+		document.token = "";
+	}
+	xhr.onerror = function () {
+		console.log("onError event")
+	}
+}
