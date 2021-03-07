@@ -73,8 +73,8 @@ func (Err *Error) ToJson() []byte {
 		exported.Eng = "internal server error"
 		exported.Ru = "Внутренняя ошибка сервера"
 	} else {
-		exported.Eng = Err.engDescription + " " + Err.engArgument
-		exported.Ru = Err.ruDescription + " " + Err.ruArgument
+		exported.Eng = Err.engDescription + " - " + Err.engArgument
+		exported.Ru = Err.ruDescription + " - " + Err.ruArgument
 	}
 	dst, _ := json.Marshal(exported)
 	return dst

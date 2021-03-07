@@ -39,6 +39,8 @@ type profileVk struct {
 /*
 **	/api/auth/oauthVk
 **	Авторизация oauth ресурса vk.com
+**	Особенность - метод api vk.com которым я пользуюсь - не возвращает email пользователя
+**	Поэтому его аккаунт всегда создается без указания почтового адреса
 **	-- В процессе написания
  */
 func authOauthVk(w http.ResponseWriter, r *http.Request) {

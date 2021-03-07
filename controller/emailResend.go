@@ -78,7 +78,7 @@ func parseEmailFromRequest(r *http.Request) (string, *errors.Error) {
 		return "", errors.InvalidRequestBody.SetOrigin(err)
 	}
 	if request.Email == nil || *request.Email == "" {
-		return "", errors.NoArgument.SetArgs("Не указана почта", "email expected")
+		return "", errors.NoArgument.SetArgs("не указана почта", "email expected")
 	}
 	return *request.Email, nil
 }
