@@ -44,11 +44,11 @@ func main() {
 	}
 	println(logger.GREEN + "успешно" + logger.NO_COLOR)
 
-	// print("Создаю таблицу картинок\t\t\t- ")
-	// if Err := postgres.CreateImagesTable(); Err != nil {
-	// 	println(logger.RED + "ошибка" + logger.NO_COLOR)
-	// 	println(logger.RED + Err.Error() + logger.NO_COLOR)
-	// 	return
-	// }
-	// println(logger.GREEN + "успешно" + logger.NO_COLOR)
+	print("Создаю таблицу пользователей vk.com\t- ")
+	if Err := postgres.CreateUsersVkStrategyTable(); Err != nil {
+		println(logger.RED + "ошибка" + logger.NO_COLOR)
+		println(logger.RED + Err.Error() + logger.NO_COLOR)
+		return
+	}
+	println(logger.GREEN + "успешно" + logger.NO_COLOR)
 }

@@ -38,7 +38,7 @@ func SendEmailConfirmMessage(user *model.UserBasic, token, serverIp string, serv
 	portString := strconv.FormatUint(uint64(serverPort), 10)
 
 	auth := smtp.PlainAuth("", conf.Email, conf.Passwd, conf.Host)
-	message := `To: <` + user.Email + `>
+	message := `To: <` + *user.Email + `>
 From: "Hypertube administration" <` + conf.Email + `>
 Subject: Confirm email in project Hypertube
 MIME-Version: 1.0
@@ -56,7 +56,7 @@ if this letter came by mistake - delete it
 </span></body></html>
 `
 
-	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{user.Email}, []byte(message)); err != nil {
+	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{*user.Email}, []byte(message)); err != nil {
 		return errors.MailerError.SetOrigin(err)
 	}
 	return nil
@@ -108,7 +108,7 @@ func SendEmailPasswdRepair(user *model.UserBasic, repairToken, serverIp string, 
 	portString := strconv.FormatUint(uint64(serverPort), 10)
 
 	auth := smtp.PlainAuth("", conf.Email, conf.Passwd, conf.Host)
-	message := `To: <` + user.Email + `>
+	message := `To: <` + *user.Email + `>
 From: "Hypertube administration" <` + conf.Email + `>
 Subject: Password repair in project Hypertube
 MIME-Version: 1.0
@@ -127,7 +127,7 @@ if this letter came by mistake - delete it
 </span></body></html>
 `
 
-	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{user.Email}, []byte(message)); err != nil {
+	if err := smtp.SendMail(conf.Host+":587", auth, conf.Email, []string{*user.Email}, []byte(message)); err != nil {
 		return errors.MailerError.SetOrigin(err)
 	}
 	return nil

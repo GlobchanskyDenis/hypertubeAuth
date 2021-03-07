@@ -37,7 +37,7 @@ func profileCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.NewEmail = &user.Email
+	user.NewEmail = user.Email
 
 	if Err = postgres.UserSetBasic(user); Err != nil {
 		logger.Error(r, Err)

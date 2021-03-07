@@ -177,16 +177,16 @@ var (
 	HashError = new(133, InternalType,
 		"Ошибка при создании хэша",
 		"Error during creating hash")
-	NotConfiguredPackage = new(133, InternalType,
+	NotConfiguredPackage = new(134, InternalType,
 		"Не сконфигурирован пакет",
 		"Not configured package")
-	NotInitializedPackage = new(134, InternalType,
+	NotInitializedPackage = new(135, InternalType,
 		"Не инициализирован пакет",
 		"Not initialized package")
-	ConfigurationFail = new(134, InternalType,
+	ConfigurationFail = new(136, InternalType,
 		"Ошибка конфигурации пакета",
 		"Failed configuration of package")
-	InitializationFail = new(135, InternalType,
+	InitializationFail = new(137, InternalType,
 		"Ошибка инициализации пакета",
 		"Failed initialization of package")
 
@@ -215,4 +215,7 @@ var (
 	ApiError = new(156, ExternalType,
 		"Внешний сервис вернул ошибку",
 		"External service returned error")
+	EmptyResponse = new(157, ExternalType,
+		"Внешний сервис не вернул данные",
+		"External service returned no data")
 )

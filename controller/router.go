@@ -22,6 +22,7 @@ func Router() http.Handler {
 	// GET
 	mux.Handle("/api/auth/basic", corsGet(http.HandlerFunc(authBasic)))
 	mux.Handle("/api/auth/oauth42", corsGet(http.HandlerFunc(authOauth42)))
+	mux.Handle("/api/auth/oauthVk", corsGet(http.HandlerFunc(authOauthVk)))
 	mux.Handle("/api/info", corsGet(http.HandlerFunc(info)))
 	mux.Handle("/api/profile/get", corsGet(authMW(http.HandlerFunc(profileGet))))
 

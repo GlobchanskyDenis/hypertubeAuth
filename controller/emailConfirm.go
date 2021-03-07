@@ -70,7 +70,7 @@ func emailConfirm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Success(r, "Пользователь #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
-		" подтвердил свой почтовый адрес "+logger.BLUE+user.Email+logger.NO_COLOR)
+		" подтвердил свой почтовый адрес "+logger.BLUE+*user.Email+logger.NO_COLOR)
 	http.Redirect(w, r,
 		conf.SocketRedirect+conf.ErrorRedirect, // ErrorRedirect -  это страница авторизации
 		http.StatusTemporaryRedirect)

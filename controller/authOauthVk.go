@@ -15,47 +15,43 @@ import (
 	"time"
 )
 
-type requestParams struct {
-	Code             string
-	State            string
-	Error            string
-	ErrorDescription string
-}
-
-type token42 struct {
+type tokenVk struct {
 	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	Scope        string `json:"scope"`
-	TokenType    string `json:"token_type"`
+	UserId		 uint	`json:"user_id"`
+	Email		 string `json:"email,omitempty"`
 	ExpiresIn    uint   `json:"expires_in"`
 	ExpiresAt    time.Time
 }
 
-type profile42 struct {
-	User42Id    uint   `json:"id"`
-	Email       string `json:"email"`
-	Fname       string `json:"first_name"`
-	Lname       string `json:"last_name"`
-	Username    string `json:"displayname"`
-	ImageBody   string `json:"image_url"`
+type responseVk struct {
+	UserVkId     uint   `json:"id"`
+	Fname        string `json:"first_name"`
+	Lname        string `json:"last_name"`
+	Username     string `json:"screen_name"`
+	IsImageExist uint   `json:"has_photo"`
+	ImageBody    string `json:"photo_200"`
+}
+
+type profileVk struct {
+	Response []responseVk `json:"response"`
 }
 
 /*
-**	/api/auth/oauth42
-**	Авторизация oauth школы 21
-**	-- Проверено
+**	/api/auth/oauthVk
+**	Авторизация oauth ресурса vk.com
+**	-- В процессе написания
  */
-func authOauth42(w http.ResponseWriter, r *http.Request) {
+func authOauthVk(w http.ResponseWriter, r *http.Request) {
 	conf, Err := getConfig()
 	if Err != nil {
 		logger.Error(r, Err)
 		http.Redirect(w, r,
-			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())), //base64.StdEncoding.EncodeToString(Err.ToJson())
+			conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
 			http.StatusTemporaryRedirect)
 		return
 	}
 
-	params, Err := parseRequestParams42(r)
+	params, Err := parseRequestParamsVk(r)
 	if Err != nil {
 		logger.Warning(r, Err.Error())
 		http.Redirect(w, r,
@@ -66,7 +62,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	/*
 	**	Getging intra42 api token
 	 */
-	token, Err := getTokenFrom42(params)
+	token, Err := getTokenFromVk(params)
 	if Err != nil {
 		logger.Error(r, Err)
 		http.Redirect(w, r,
@@ -74,10 +70,11 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 			http.StatusTemporaryRedirect)
 		return
 	}
+
 	/*
 	**	Getting user profile from intra api and fills it into *model.User42
 	 */
-	user, Err := getUser42(token)
+	user, Err := getUserVk(token)
 	if Err != nil {
 		logger.Error(r, Err)
 		http.Redirect(w, r,
@@ -90,12 +87,12 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	/*
 	**	getting user from db if it exists
 	 */
-	userFromDb, Err := postgres.UserGet42ById(user.User42Id)
+	userFromDb, Err := postgres.UserGetVkById(user.UserVkId)
 	if Err != nil {
 		if errors.UserNotExist.IsOverlapWithError(Err) {
 			// user not exists
-			logger.Log(r, "User42 with user42Id "+strconv.Itoa(int(user.User42Id))+" not found in database. Creating new one")
-			if userBasic, Err = postgres.UserSet42(user); Err != nil {
+			logger.Log(r, "UserVk with userVkId "+strconv.Itoa(int(user.UserVkId))+" not found in database. Creating new one")
+			if userBasic, Err = postgres.UserSetVk(user); Err != nil {
 				logger.Error(r, Err)
 				http.Redirect(w, r,
 					conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
@@ -112,7 +109,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		user.UserId = userFromDb.UserId
-		if Err = postgres.UserUpdate42(user); Err != nil {
+		if Err = postgres.UserUpdateVk(user); Err != nil {
 			logger.Error(r, Err)
 			http.Redirect(w, r,
 				conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
@@ -127,7 +124,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 				http.StatusTemporaryRedirect)
 			return
 		}
-		if Err = postgres.UserUpdate42(user); Err != nil {
+		if Err = postgres.UserUpdateVk(user); Err != nil {
 			logger.Error(r, Err)
 			http.Redirect(w, r,
 				conf.SocketRedirect+conf.ErrorRedirect+"?error="+url.QueryEscape(string(Err.ToJson())),
@@ -146,10 +143,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was authenticated")
-	cookie := &http.Cookie{Name: "accessToken", Value: accessToken, HttpOnly: false}
 
-	http.SetCookie(w, cookie)
-	// w.Header().Add("accessToken", accessToken)
 	http.Redirect(w, r,
 		conf.SocketRedirect+conf.OauthRedirect+"?accessToken="+accessToken,
 		http.StatusTemporaryRedirect)
@@ -158,7 +152,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 /*
 **	Parsing GET params from request
  */
-func parseRequestParams42(r *http.Request) (requestParams, *errors.Error) {
+func parseRequestParamsVk(r *http.Request) (requestParams, *errors.Error) {
 	var params requestParams
 
 	params.Code = r.FormValue("code")
@@ -167,11 +161,11 @@ func parseRequestParams42(r *http.Request) (requestParams, *errors.Error) {
 	params.ErrorDescription = r.FormValue("error_description")
 
 	if params.Error != "" || params.ErrorDescription != "" {
-		return params, errors.AccessDenied.SetHidden("Сервер авторизации 42 ответил: " +
+		return params, errors.AccessDenied.SetHidden("Сервер авторизации vk.com ответил: " +
 			params.Error + " - " + params.ErrorDescription)
 	}
 	if params.Code == "" || params.State == "" {
-		return params, errors.AccessDenied.SetHidden("Сервер авторизации 42 прислал невалидные данные. code: " +
+		return params, errors.AccessDenied.SetHidden("Сервер авторизации vk.com прислал невалидные данные. code: " +
 			params.Code + " state" + params.State)
 	}
 	return params, nil
@@ -180,8 +174,8 @@ func parseRequestParams42(r *http.Request) (requestParams, *errors.Error) {
 /*
 **	Request to ecole 42 server API for token
  */
-func getTokenFrom42(params requestParams) (token42, *errors.Error) {
-	var result token42
+func getTokenFromVk(params requestParams) (tokenVk, *errors.Error) {
+	var result tokenVk
 
 	conf, Err := getConfig()
 	if Err != nil {
@@ -190,54 +184,14 @@ func getTokenFrom42(params requestParams) (token42, *errors.Error) {
 	portString := strconv.FormatUint(uint64(conf.ServerPort), 10)
 
 	formData := url.Values{
-		"client_id":     {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"},
-		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"},
+		"client_id":     {"7781054"},
+		"client_secret": {"QjqXIFHyGKD0NALIzodR"},
 		"code":          {params.Code},
-		"state":         {params.State},
-		// "redirect_uri": {"file:///home/skinny/Documents/go/src/HypertubeAuth/client/client.html",},
-		"redirect_uri": {"http://localhost:" + portString + "/api/auth/oauth42"},
-		"grant_type":   {"authorization_code"},
+		"redirect_uri": {"http://"+conf.ServerIp+":"+portString+"/api/auth/oauthVk"},
 	}
-	resp, err := http.PostForm("https://api.intra.42.fr/oauth/token", formData)
+	resp, err := http.PostForm("https://oauth.vk.com/access_token", formData)
 	if err != nil {
-		return result, errors.AccessDenied.SetHidden("Запрос токена из 42 провален").SetOrigin(err)
-	}
-
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
-		return result, errors.AccessDenied.SetHidden("Декодирование json дало ошибку").SetOrigin(err)
-	}
-	if result.ExpiresIn < 4 {
-		result, Err := refreshTokenFrom42(result.RefreshToken)
-		return result, Err
-	}
-	duration, err := time.ParseDuration(strconv.FormatUint(uint64(result.ExpiresIn), 10) + "s")
-	if err != nil {
-		return result, errors.UnknownInternalError.SetArgs("ошибка парсинга времени", "time parse fail").SetOrigin(err)
-	}
-	result.ExpiresAt = time.Now().Add(duration)
-	return result, nil
-}
-
-func refreshTokenFrom42(refreshToken string) (token42, *errors.Error) {
-	var result token42
-
-	conf, Err := getConfig()
-	if Err != nil {
-		return result, Err
-	}
-	portString := strconv.FormatUint(uint64(conf.ServerPort), 10)
-
-	formData := url.Values{
-		"client_id":     {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"},
-		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"},
-		"refresh_token": {refreshToken},
-		"redirect_uri":  {"http://localhost:" + portString + "/api/auth/oauth42"},
-		"grant_type":    {"refresh_token"},
-	}
-	resp, err := http.PostForm("https://api.intra.42.fr/oauth/token", formData)
-	if err != nil {
-		return result, errors.AccessDenied.SetHidden("Запрос токена из 42 провален").SetOrigin(err)
+		return result, errors.AccessDenied.SetHidden("Запрос токена из vk.com провален").SetOrigin(err)
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
@@ -255,8 +209,8 @@ func refreshTokenFrom42(refreshToken string) (token42, *errors.Error) {
 /*
 **	Request to ecole 42 server API for user profile
  */
-func getUserProfile(accessToken string) (profile42, *errors.Error) {
-	var profile profile42
+func getUserProfileVk(token tokenVk) (profileVk, *errors.Error) {
+	var profile profileVk
 	transport := &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -272,46 +226,57 @@ func getUserProfile(accessToken string) (profile42, *errors.Error) {
 		Timeout:   time.Second * 10,
 		Transport: transport,
 	}
-	url := "https://api.intra.42.fr/v2/me"
+	url := "https://api.vk.com/method/users.get?access_token="+token.AccessToken+
+		"&user_ids="+strconv.Itoa(int(token.UserId))+
+		"&fields=has_photo,photo_200,nickname,screen_name"+
+		"&v=5.130"
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return profile, errors.AccessDenied.SetHidden("Запрос данных пользователя 42 провален").SetOrigin(err)
+		return profile, errors.AccessDenied.SetHidden("Запрос данных пользователя vk.com провален").SetOrigin(err)
 	}
-	req.Header.Add("Authorization", "Bearer "+accessToken)
 	resp, err := client.Do(req)
 	if err != nil {
-		return profile, errors.AccessDenied.SetHidden("Запрос данных пользователя 42 провален").SetOrigin(err)
+		return profile, errors.AccessDenied.SetHidden("Запрос данных пользователя vk.com провален").SetOrigin(err)
 	}
 	defer resp.Body.Close() // важный пункт!
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return profile, errors.AccessDenied.SetHidden("Чтение данных пользователя 42 провалено").SetOrigin(err)
+		return profile, errors.AccessDenied.SetHidden("Чтение данных пользователя vk.com провалено").SetOrigin(err)
 	}
 	if err = json.Unmarshal(respBody, &profile); err != nil {
 		return profile, errors.AccessDenied.SetHidden("Декодирование данных пользователя из json дало ошибку").SetOrigin(err)
+	}
+	if len(profile.Response) == 0 {
+		return profile, errors.EmptyResponse
 	}
 	return profile, nil
 }
 
 /*
-**	Forming User42 structure
+**	Forming UserVk structure
  */
-func getUser42(token token42) (*model.User42, *errors.Error) {
-	profile, Err := getUserProfile(token.AccessToken)
+func getUserVk(token tokenVk) (*model.UserVk, *errors.Error) {
+	profile, Err := getUserProfileVk(token)
 	if Err != nil {
 		return nil, Err
 	}
 
-	return &model.User42{
-		Email:       profile.Email,
-		Fname:       profile.Fname,
-		Lname:       profile.Lname,
-		Username:    profile.Username,
-		ImageBody:   profile.ImageBody,
-		User42Model: model.User42Model{
-			User42Id:     profile.User42Id,
+	var imageBodyPtr *string
+
+	if profile.Response[0].IsImageExist == 1 {
+		imageBodyPtr = &profile.Response[0].ImageBody
+	} else {
+		imageBodyPtr = nil
+	}
+
+	return &model.UserVk{
+		Fname:       profile.Response[0].Fname,
+		Lname:       profile.Response[0].Lname,
+		Username:    profile.Response[0].Username,
+		ImageBody:   imageBodyPtr,
+		UserVkModel: model.UserVkModel{
+			UserVkId:     profile.Response[0].UserVkId,
 			AccessToken:  &token.AccessToken,
-			RefreshToken: &token.RefreshToken,
 			ExpiresAt:    &token.ExpiresAt,
 		},
 	}, nil

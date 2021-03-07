@@ -52,6 +52,9 @@ func DropAllTables() *errors.Error {
 	if _, err := conn.db.Exec("DROP TABLE IF EXISTS users_42_strategy"); err != nil {
 		return errors.DatabaseError.SetOrigin(err)
 	}
+	if _, err := conn.db.Exec("DROP TABLE IF EXISTS users_vk_strategy"); err != nil {
+		return errors.DatabaseError.SetOrigin(err)
+	}
 	if _, err := conn.db.Exec("DROP TABLE IF EXISTS users"); err != nil {
 		return errors.DatabaseError.SetOrigin(err)
 	}
@@ -64,16 +67,17 @@ func CreateUsersTable() *errors.Error {
 		return Err
 	}
 	if _, err := conn.db.Exec("CREATE TABLE users(user_id SERIAL PRIMARY KEY, " +
-		"user_42_id INTEGER, " +
-		"image_body VARCHAR, " +
-		"email VARCHAR CONSTRAINT users_email_key UNIQUE NOT NULL, " +
+		"user_42_id INTEGER NULL, " +
+		"user_vk_id INTEGER NULL, " +
+		"image_body VARCHAR NULL, " +
+		"email VARCHAR CONSTRAINT users_email_key UNIQUE NULL, " +
 		"encryptedPass VARCHAR(35) DEFAULT NULL, " +
 		"first_name VARCHAR DEFAULT NULL, " +
 		"last_name VARCHAR DEFAULT NULL, " +
 		"username VARCHAR NOT NULL, " +
 		"is_email_confirmed BOOL NOT NULL DEFAULT false, " +
 		"new_email VARCHAR NULL)"); err != nil {
-		return errors.DatabaseError.SetArgs("11", "11").SetOrigin(err)
+		return errors.DatabaseError.SetOrigin(err)
 	}
 	return nil
 }
@@ -89,7 +93,22 @@ func CreateUsers42StrategyTable() *errors.Error {
 		"refresh_token VARCHAR, " +
 		"expires_at TIMESTAMP, " +
 		"CONSTRAINT user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE)"); err != nil {
-		return errors.DatabaseError.SetArgs("2", "2").SetOrigin(err)
+		return errors.DatabaseError.SetOrigin(err)
+	}
+	return nil
+}
+
+func CreateUsersVkStrategyTable() *errors.Error {
+	conn, Err := getConnection()
+	if Err != nil {
+		return Err
+	}
+	if _, err := conn.db.Exec("CREATE TABLE users_vk_strategy(user_vk_id INTEGER PRIMARY KEY, " +
+		"user_id INTEGER NOT NULL, " +
+		"access_token VARCHAR, " +
+		"expires_at TIMESTAMP, " +
+		"CONSTRAINT user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE)"); err != nil {
+		return errors.DatabaseError.SetOrigin(err)
 	}
 	return nil
 }

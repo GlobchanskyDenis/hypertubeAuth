@@ -71,7 +71,7 @@ func emailPatchConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Email = *user.NewEmail
+	user.Email = user.NewEmail
 
 	if Err = postgres.UserConfirmEmailBasic(user); Err != nil {
 		logger.Error(r, Err)
@@ -82,7 +82,7 @@ func emailPatchConfirm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Success(r, "Пользователь #"+logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+
-		" подтвердил изменения своего почтового адреса "+logger.BLUE+user.Email+logger.NO_COLOR)
+		" подтвердил изменения своего почтового адреса "+logger.BLUE+*user.Email+logger.NO_COLOR)
 	http.Redirect(w, r,
 		conf.SocketRedirect+conf.ErrorRedirect,
 		http.StatusTemporaryRedirect)

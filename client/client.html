@@ -27,6 +27,14 @@
 				<input type="hidden" name="response_type" value="code">
 				<input type="submit" class="input_submit" value="школа 21">
 			</form>
+			<form method="get" action="https://oauth.vk.com/authorize">
+				<input type="hidden" name="client_id" value="7781054">
+				<input type="hidden" name="redirect_uri" value="http://localhost:4000/api/auth/oauthVk">
+				<input type="hidden" name="scope" value="offline+photos">
+				<input type="hidden" name="state" value="bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d">
+				<input type="hidden" name="response_type" value="code">
+				<input type="submit" class="input_submit" value="Вконтакте">
+			</form>
 		</div>
 		<div>
 			<form name="profileCreate">

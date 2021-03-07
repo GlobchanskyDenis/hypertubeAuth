@@ -77,7 +77,7 @@ func UserGetBasicById(userId uint) (*model.UserBasic, *errors.Error) {
 		return nil, errors.UserNotExist
 	}
 	var user = &model.UserBasic{}
-	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
+	if err := rows.Scan(&user.UserId, &user.User42Id, &user.UserVkId, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
 		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
@@ -99,7 +99,7 @@ func UserGetBasicByIdTx(tx *sql.Tx, userId uint) (*model.UserBasic, *errors.Erro
 		return nil, errors.UserNotExist
 	}
 	var user = &model.UserBasic{}
-	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
+	if err := rows.Scan(&user.UserId, &user.User42Id, &user.UserVkId, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
 		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
@@ -125,7 +125,7 @@ func UserGetBasicByEmail(email string) (*model.UserBasic, *errors.Error) {
 		return nil, errors.UserNotExist
 	}
 	var user = &model.UserBasic{}
-	if err := rows.Scan(&user.UserId, &user.User42Id, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
+	if err := rows.Scan(&user.UserId, &user.User42Id, &user.UserVkId, &user.ImageBody, &user.Email, &user.EncryptedPass, &user.Fname,
 		&user.Lname, &user.Username, &user.IsEmailConfirmed, &user.NewEmail); err != nil {
 		return nil, errors.DatabaseScanError.SetOrigin(err)
 	}
