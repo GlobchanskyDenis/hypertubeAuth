@@ -32,12 +32,12 @@ type token42 struct {
 }
 
 type profile42 struct {
-	User42Id    uint   `json:"id"`
-	Email       string `json:"email"`
-	Fname       string `json:"first_name"`
-	Lname       string `json:"last_name"`
-	Username    string `json:"displayname"`
-	ImageBody   string `json:"image_url"`
+	User42Id  uint   `json:"id"`
+	Email     string `json:"email"`
+	Fname     string `json:"first_name"`
+	Lname     string `json:"last_name"`
+	Username  string `json:"displayname"`
+	ImageBody string `json:"image_url"`
 }
 
 /*
@@ -303,11 +303,11 @@ func getUser42(token token42) (*model.User42, *errors.Error) {
 	}
 
 	return &model.User42{
-		Email:       profile.Email,
-		Fname:       profile.Fname,
-		Lname:       profile.Lname,
-		Username:    profile.Username,
-		ImageBody:   profile.ImageBody,
+		Email:     profile.Email,
+		Fname:     profile.Fname,
+		Lname:     profile.Lname,
+		Username:  profile.Username,
+		ImageBody: profile.ImageBody,
 		User42Model: model.User42Model{
 			User42Id:     profile.User42Id,
 			AccessToken:  &token.AccessToken,

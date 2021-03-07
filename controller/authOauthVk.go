@@ -16,11 +16,11 @@ import (
 )
 
 type tokenVk struct {
-	AccessToken  string `json:"access_token"`
-	UserId		 uint	`json:"user_id"`
-	Email		 string `json:"email,omitempty"`
-	ExpiresIn    uint   `json:"expires_in"`
-	ExpiresAt    time.Time
+	AccessToken string `json:"access_token"`
+	UserId      uint   `json:"user_id"`
+	Email       string `json:"email,omitempty"`
+	ExpiresIn   uint   `json:"expires_in"`
+	ExpiresAt   time.Time
 }
 
 type responseVk struct {
@@ -189,7 +189,7 @@ func getTokenFromVk(params requestParams) (tokenVk, *errors.Error) {
 		"client_id":     {"7781054"},
 		"client_secret": {"QjqXIFHyGKD0NALIzodR"},
 		"code":          {params.Code},
-		"redirect_uri": {"http://"+conf.ServerIp+":"+portString+"/api/auth/oauthVk"},
+		"redirect_uri":  {"http://" + conf.ServerIp + ":" + portString + "/api/auth/oauthVk"},
 	}
 	resp, err := http.PostForm("https://oauth.vk.com/access_token", formData)
 	if err != nil {
@@ -228,9 +228,9 @@ func getUserProfileVk(token tokenVk) (profileVk, *errors.Error) {
 		Timeout:   time.Second * 10,
 		Transport: transport,
 	}
-	url := "https://api.vk.com/method/users.get?access_token="+token.AccessToken+
-		"&user_ids="+strconv.Itoa(int(token.UserId))+
-		"&fields=has_photo,photo_200,nickname,screen_name"+
+	url := "https://api.vk.com/method/users.get?access_token=" + token.AccessToken +
+		"&user_ids=" + strconv.Itoa(int(token.UserId)) +
+		"&fields=has_photo,photo_200,nickname,screen_name" +
 		"&v=5.130"
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -272,14 +272,14 @@ func getUserVk(token tokenVk) (*model.UserVk, *errors.Error) {
 	}
 
 	return &model.UserVk{
-		Fname:       profile.Response[0].Fname,
-		Lname:       profile.Response[0].Lname,
-		Username:    profile.Response[0].Username,
-		ImageBody:   imageBodyPtr,
+		Fname:     profile.Response[0].Fname,
+		Lname:     profile.Response[0].Lname,
+		Username:  profile.Response[0].Username,
+		ImageBody: imageBodyPtr,
 		UserVkModel: model.UserVkModel{
-			UserVkId:     profile.Response[0].UserVkId,
-			AccessToken:  &token.AccessToken,
-			ExpiresAt:    &token.ExpiresAt,
+			UserVkId:    profile.Response[0].UserVkId,
+			AccessToken: &token.AccessToken,
+			ExpiresAt:   &token.ExpiresAt,
 		},
 	}, nil
 }

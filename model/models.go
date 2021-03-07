@@ -17,7 +17,7 @@ type UserBasicModel struct {
 	Lname            *string `json:"lastName"`
 	Username         string  `json:"username"`
 	IsEmailConfirmed bool    `json:"-"`
-	NewEmail		 *string `json:"-"`
+	NewEmail         *string `json:"-"`
 }
 
 type UserBasic struct {
@@ -35,26 +35,26 @@ type User42Model struct {
 
 type User42 struct {
 	User42Model
-	Email       string `json:"-"`
-	Fname       string `json:"-"`
-	Lname       string `json:"-"`
-	Username    string `json:"-"`
-	ImageBody   string `json:"-"`
+	Email     string `json:"-"`
+	Fname     string `json:"-"`
+	Lname     string `json:"-"`
+	Username  string `json:"-"`
+	ImageBody string `json:"-"`
 }
 
 type UserVkModel struct {
-	UserVkId     uint       `json:"-"`
-	UserId       uint       `json:"-"`
-	AccessToken  *string    `json:"-"`
-	ExpiresAt    *time.Time `json:"-"`
+	UserVkId    uint       `json:"-"`
+	UserId      uint       `json:"-"`
+	AccessToken *string    `json:"-"`
+	ExpiresAt   *time.Time `json:"-"`
 }
 
 type UserVk struct {
 	UserVkModel
-	Fname       string  `json:"-"`
-	Lname       string  `json:"-"`
-	Username    string  `json:"-"`
-	ImageBody   *string `json:"-"`
+	Fname     string  `json:"-"`
+	Lname     string  `json:"-"`
+	Username  string  `json:"-"`
+	ImageBody *string `json:"-"`
 }
 
 type AccessTokenHeader struct {

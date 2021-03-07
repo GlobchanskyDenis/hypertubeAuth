@@ -40,7 +40,7 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 	if idString != "" {
 		idInt, err := strconv.Atoi(idString)
 		if err != nil {
-			logger.Warning(r, "Id пользователя ("+idString+") содежит ошибку: " + err.Error())
+			logger.Warning(r, "Id пользователя ("+idString+") содежит ошибку: "+err.Error())
 			errorResponse(w, errors.InvalidRequestBody)
 			return
 		}

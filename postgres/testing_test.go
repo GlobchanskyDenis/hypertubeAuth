@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	emailValid1      = "user1@gmail.com"
-	emailValid2      = "user2@gmail.com"
-	encryptedPass    = "WQEsafqwesa="
-	username         = "USER"
+	emailValid1   = "user1@gmail.com"
+	emailValid2   = "user2@gmail.com"
+	encryptedPass = "WQEsafqwesa="
+	username      = "USER"
 )
 
 func initTest(t *testing.T) {

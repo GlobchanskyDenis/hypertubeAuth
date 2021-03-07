@@ -34,7 +34,7 @@ func passwdRepairPatch(w http.ResponseWriter, r *http.Request) {
 
 	passwd, Err := parsePasswordFromRequest(r)
 	if Err != nil {
-		logger.Error(r, Err)// Warning?
+		logger.Error(r, Err) // Warning?
 		errorResponse(w, Err)
 		return
 	}
