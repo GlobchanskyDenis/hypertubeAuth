@@ -64,7 +64,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	/*
-	**	Getging intra42 api token
+	**	Get intra42 api access token
 	 */
 	token, Err := getTokenFrom42(params)
 	if Err != nil {
@@ -111,6 +111,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
+		// user exists
 		user.UserId = userFromDb.UserId
 		if Err = postgres.UserUpdate42(user); Err != nil {
 			logger.Error(r, Err)
@@ -146,10 +147,7 @@ func authOauth42(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was authenticated")
-	cookie := &http.Cookie{Name: "accessToken", Value: accessToken, HttpOnly: false}
 
-	http.SetCookie(w, cookie)
-	// w.Header().Add("accessToken", accessToken)
 	http.Redirect(w, r,
 		conf.SocketRedirect+conf.OauthRedirect+"?accessToken="+accessToken,
 		http.StatusTemporaryRedirect)
@@ -190,13 +188,12 @@ func getTokenFrom42(params requestParams) (token42, *errors.Error) {
 	portString := strconv.FormatUint(uint64(conf.ServerPort), 10)
 
 	formData := url.Values{
-		"client_id":     {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"},
-		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"},
+		"client_id":     {conf.Ecole42ClientId},
+		"client_secret": {conf.Ecole42Secret},
 		"code":          {params.Code},
 		"state":         {params.State},
-		// "redirect_uri": {"file:///home/skinny/Documents/go/src/HypertubeAuth/client/client.html",},
-		"redirect_uri": {"http://localhost:" + portString + "/api/auth/oauth42"},
-		"grant_type":   {"authorization_code"},
+		"redirect_uri":  {"http://" + conf.ServerIp + ":" + portString + "/api/auth/oauth42"},
+		"grant_type":    {"authorization_code"},
 	}
 	resp, err := http.PostForm("https://api.intra.42.fr/oauth/token", formData)
 	if err != nil {

@@ -12,14 +12,14 @@ func TestSetUserBasic(t *testing.T) {
 		user1 = &model.UserBasic{}
 		user2 = &model.UserBasic{}
 	)
-	user1.Email = emailValid1
+	user1.Email = &emailValid1
 	user1.EncryptedPass = &encryptedPass
 	fname := "Denis"
 	user1.Fname = &fname
 	lname := "Globchansky"
 	user1.Lname = &lname
 	user1.Username = username
-	user2.Email = emailValid2
+	user2.Email = &emailValid2
 	user2.EncryptedPass = &encryptedPass
 	user2.Username = username
 
@@ -74,7 +74,11 @@ func TestSetUserBasic(t *testing.T) {
 	})
 
 	t.Run("valid get user #1 by email", func(t_ *testing.T) {
-		newUser, Err := UserGetBasicByEmail(user1.Email)
+		if user1.Email == nil {
+			t_.Errorf("%sFail: email is nil. Skip test%s", logger.RED_BG, logger.NO_COLOR)
+			t_.FailNow()
+		}
+		newUser, Err := UserGetBasicByEmail(*user1.Email)
 		if Err != nil {
 			t_.Errorf("%sError: %s%s", logger.RED_BG, Err.Error(), logger.NO_COLOR)
 		} else {
@@ -82,9 +86,13 @@ func TestSetUserBasic(t *testing.T) {
 				t_.Errorf("%sError: received users Id differs. Expected %d got %d%s", logger.RED_BG,
 					user1.UserId, newUser.UserId, logger.NO_COLOR)
 			}
-			if user1.Email != newUser.Email {
+			if newUser.Email == nil {
+				t_.Errorf("%sFail: email of new user is nil. Skip test%s", logger.RED_BG, logger.NO_COLOR)
+				t_.FailNow()
+			}
+			if *user1.Email != *newUser.Email {
 				t_.Errorf("%sError: received users Email differs. Expected %s got %s%s", logger.RED_BG,
-					user1.Email, newUser.Email, logger.NO_COLOR)
+					*user1.Email, *newUser.Email, logger.NO_COLOR)
 			}
 			if (user1.EncryptedPass != nil && newUser.EncryptedPass == nil) ||
 				(user1.EncryptedPass == nil && newUser.EncryptedPass != nil) {
@@ -172,9 +180,13 @@ func TestSetUserBasic(t *testing.T) {
 				t_.Errorf("%sError: received users Id differs. Expected %d got %d%s", logger.RED_BG,
 					user1.UserId, newUser.UserId, logger.NO_COLOR)
 			}
-			if user1.Email != newUser.Email {
+			if newUser.Email == nil || user1.Email == nil {
+				t_.Errorf("%sFail: email is nil. Skip test%s", logger.RED_BG, logger.NO_COLOR)
+				t_.FailNow()
+			}
+			if *user1.Email != *newUser.Email {
 				t_.Errorf("%sError: received users Email differs. Expected %s got %s%s", logger.RED_BG,
-					user1.Email, newUser.Email, logger.NO_COLOR)
+					*user1.Email, *newUser.Email, logger.NO_COLOR)
 			}
 			if (user1.EncryptedPass != nil && newUser.EncryptedPass == nil) ||
 				(user1.EncryptedPass == nil && newUser.EncryptedPass != nil) {

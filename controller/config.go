@@ -13,6 +13,12 @@ type Config struct {
 	OauthRedirect       string `conf:"oauthRedirect"`
 	ErrorRedirect       string `conf:"errorRedirect"`
 	PasswdResetRedirect string `conf:"passwdResetRedirect"`
+	Ecole42ClientId     string `conf:"ecole42ClientId"`
+	Ecole42Secret       string `conf:"ecole42Secret"`
+	FacebookClientId    string `conf:"facebookClientId"`
+	FacebookSecret      string `conf:"facebookSecret"`
+	VkClientId          string `conf:"vkClientId"`
+	VkSecret            string `conf:"vkSecret"`
 }
 
 var cfg *Config

@@ -10,6 +10,7 @@ type UserBasicModel struct {
 	UserId           uint    `json:"userId"`
 	User42Id         *uint   `json:"-"`
 	UserVkId         *uint   `json:"-"`
+	UserFbId         *uint   `json:"-"`
 	ImageBody        *string `json:"imageBody"`
 	Email            *string `json:"email"`
 	EncryptedPass    *string `json:"-"`
@@ -51,6 +52,22 @@ type UserVkModel struct {
 
 type UserVk struct {
 	UserVkModel
+	Fname     string  `json:"-"`
+	Lname     string  `json:"-"`
+	Username  string  `json:"-"`
+	ImageBody *string `json:"-"`
+}
+
+type UserFbModel struct {
+	UserFbId    uint       `json:"-"`
+	UserId      uint       `json:"-"`
+	AccessToken *string    `json:"-"`
+	ExpiresAt   *time.Time `json:"-"`
+}
+
+type UserFb struct {
+	UserFbModel
+	Email     *string `json:"email"`
 	Fname     string  `json:"-"`
 	Lname     string  `json:"-"`
 	Username  string  `json:"-"`
@@ -111,5 +128,15 @@ func (user *UserBasic) ExtractFromUserVk(userVk *UserVk) {
 	user.Fname = &userVk.Fname
 	user.Lname = &userVk.Lname
 	user.Username = userVk.Username
+	user.IsEmailConfirmed = true
+}
+
+func (user *UserBasic) ExtractFromUserFb(userFb *UserFb) {
+	user.UserFbId = &userFb.UserFbId
+	user.Email = userFb.Email
+	user.ImageBody = userFb.ImageBody
+	user.Fname = &userFb.Fname
+	user.Lname = &userFb.Lname
+	user.Username = userFb.Username
 	user.IsEmailConfirmed = true
 }

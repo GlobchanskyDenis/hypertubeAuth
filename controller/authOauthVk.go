@@ -41,7 +41,7 @@ type profileVk struct {
 **	Авторизация oauth ресурса vk.com
 **	Особенность - метод api vk.com которым я пользуюсь - не возвращает email пользователя
 **	Поэтому его аккаунт всегда создается без указания почтового адреса
-**	-- В процессе написания
+**	-- Проверено
  */
 func authOauthVk(w http.ResponseWriter, r *http.Request) {
 	conf, Err := getConfig()
@@ -62,7 +62,7 @@ func authOauthVk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	/*
-	**	Getging intra42 api token
+	**	Get vk api access token
 	 */
 	token, Err := getTokenFromVk(params)
 	if Err != nil {
@@ -74,7 +74,7 @@ func authOauthVk(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/*
-	**	Getting user profile from intra api and fills it into *model.User42
+	**	Getting user profile from vk api and fills it into *model.UserVk
 	 */
 	user, Err := getUserVk(token)
 	if Err != nil {
@@ -174,7 +174,7 @@ func parseRequestParamsVk(r *http.Request) (requestParams, *errors.Error) {
 }
 
 /*
-**	Request to ecole 42 server API for token
+**	Request to vk API for token
  */
 func getTokenFromVk(params requestParams) (tokenVk, *errors.Error) {
 	var result tokenVk
@@ -186,8 +186,8 @@ func getTokenFromVk(params requestParams) (tokenVk, *errors.Error) {
 	portString := strconv.FormatUint(uint64(conf.ServerPort), 10)
 
 	formData := url.Values{
-		"client_id":     {"7781054"},
-		"client_secret": {"QjqXIFHyGKD0NALIzodR"},
+		"client_id":     {conf.VkClientId},
+		"client_secret": {conf.VkSecret},
 		"code":          {params.Code},
 		"redirect_uri":  {"http://" + conf.ServerIp + ":" + portString + "/api/auth/oauthVk"},
 	}
@@ -209,7 +209,7 @@ func getTokenFromVk(params requestParams) (tokenVk, *errors.Error) {
 }
 
 /*
-**	Request to ecole 42 server API for user profile
+**	Request to vk API for user profile
  */
 func getUserProfileVk(token tokenVk) (profileVk, *errors.Error) {
 	var profile profileVk

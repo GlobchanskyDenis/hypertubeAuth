@@ -51,4 +51,12 @@ func main() {
 		return
 	}
 	println(logger.GREEN + "успешно" + logger.NO_COLOR)
+
+	print("Создаю таблицу пользователей facebook\t- ")
+	if Err := postgres.CreateUsersFbStrategyTable(); Err != nil {
+		println(logger.RED + "ошибка" + logger.NO_COLOR)
+		println(logger.RED + Err.Error() + logger.NO_COLOR)
+		return
+	}
+	println(logger.GREEN + "успешно" + logger.NO_COLOR)
 }

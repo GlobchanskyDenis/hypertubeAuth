@@ -55,6 +55,9 @@ func DropAllTables() *errors.Error {
 	if _, err := conn.db.Exec("DROP TABLE IF EXISTS users_vk_strategy"); err != nil {
 		return errors.DatabaseError.SetOrigin(err)
 	}
+	if _, err := conn.db.Exec("DROP TABLE IF EXISTS users_fb_strategy"); err != nil {
+		return errors.DatabaseError.SetOrigin(err)
+	}
 	if _, err := conn.db.Exec("DROP TABLE IF EXISTS users"); err != nil {
 		return errors.DatabaseError.SetOrigin(err)
 	}
@@ -66,10 +69,11 @@ func CreateUsersTable() *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	if _, err := conn.db.Exec("CREATE TABLE users(user_id SERIAL PRIMARY KEY, " +
-		"user_42_id INTEGER NULL, " +
-		"user_vk_id INTEGER NULL, " +
-		"image_body VARCHAR NULL, " +
+	if _, err := conn.db.Exec("CREATE TABLE users(user_id BIGSERIAL PRIMARY KEY, " +
+		"user_42_id BIGINT NULL, " +
+		"user_vk_id BIGINT NULL, " +
+		"user_fb_id BIGINT NULL, " +
+		"image_body bytea NULL, " +
 		"email VARCHAR CONSTRAINT users_email_key UNIQUE NULL, " +
 		"encryptedPass VARCHAR(35) DEFAULT NULL, " +
 		"first_name VARCHAR DEFAULT NULL, " +
@@ -87,8 +91,8 @@ func CreateUsers42StrategyTable() *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	if _, err := conn.db.Exec("CREATE TABLE users_42_strategy(user_42_id INTEGER PRIMARY KEY, " +
-		"user_id INTEGER NOT NULL, " +
+	if _, err := conn.db.Exec("CREATE TABLE users_42_strategy(user_42_id BIGINT PRIMARY KEY, " +
+		"user_id BIGINT NOT NULL, " +
 		"access_token VARCHAR, " +
 		"refresh_token VARCHAR, " +
 		"expires_at TIMESTAMP, " +
@@ -103,8 +107,23 @@ func CreateUsersVkStrategyTable() *errors.Error {
 	if Err != nil {
 		return Err
 	}
-	if _, err := conn.db.Exec("CREATE TABLE users_vk_strategy(user_vk_id INTEGER PRIMARY KEY, " +
-		"user_id INTEGER NOT NULL, " +
+	if _, err := conn.db.Exec("CREATE TABLE users_vk_strategy(user_vk_id BIGINT PRIMARY KEY, " +
+		"user_id BIGINT NOT NULL, " +
+		"access_token VARCHAR, " +
+		"expires_at TIMESTAMP, " +
+		"CONSTRAINT user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE)"); err != nil {
+		return errors.DatabaseError.SetOrigin(err)
+	}
+	return nil
+}
+
+func CreateUsersFbStrategyTable() *errors.Error {
+	conn, Err := getConnection()
+	if Err != nil {
+		return Err
+	}
+	if _, err := conn.db.Exec("CREATE TABLE users_fb_strategy(user_fb_id BIGINT PRIMARY KEY, " +
+		"user_id BIGINT NOT NULL, " +
 		"access_token VARCHAR, " +
 		"expires_at TIMESTAMP, " +
 		"CONSTRAINT user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE)"); err != nil {
