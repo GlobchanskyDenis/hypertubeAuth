@@ -226,8 +226,8 @@ func refreshTokenFrom42(refreshToken string) (token42, *errors.Error) {
 	portString := strconv.FormatUint(uint64(conf.ServerPort), 10)
 
 	formData := url.Values{
-		"client_id":     {"96975efecfd0e5efee67c9ac4cc350ac9372ae559b2fb8a08feba6841a33fb53"},
-		"client_secret": {"bdcbe28874ab05962b50430b1466a8ebcbda45ba8c3c1beee600699478ad2a4d"},
+		"client_id":     {conf.Ecole42ClientId},
+		"client_secret": {conf.Ecole42Secret},
 		"refresh_token": {refreshToken},
 		"redirect_uri":  {"http://localhost:" + portString + "/api/auth/oauth42"},
 		"grant_type":    {"refresh_token"},
