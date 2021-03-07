@@ -255,7 +255,7 @@ func refreshTokenFrom42(refreshToken string) (token42, *errors.Error) {
 /*
 **	Request to ecole 42 server API for user profile
  */
-func getUserProfile(accessToken string) (profile42, *errors.Error) {
+func getUserProfile42(accessToken string) (profile42, *errors.Error) {
 	var profile profile42
 	transport := &http.Transport{
 		DialContext: (&net.Dialer{
@@ -297,7 +297,7 @@ func getUserProfile(accessToken string) (profile42, *errors.Error) {
 **	Forming User42 structure
  */
 func getUser42(token token42) (*model.User42, *errors.Error) {
-	profile, Err := getUserProfile(token.AccessToken)
+	profile, Err := getUserProfile42(token.AccessToken)
 	if Err != nil {
 		return nil, Err
 	}
