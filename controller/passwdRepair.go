@@ -49,7 +49,7 @@ func passwdRepair(w http.ResponseWriter, r *http.Request) {
 		if Err := mailer.SendEmailPasswdRepair(user, repairToken, serverIp, serverPort); Err != nil {
 			logger.Error(r, Err)
 		} else {
-			logger.Success(r, "Писмьмо для подтверждения почты пользователя #"+
+			logger.Success(r, "Писмьмо для восстановления пароля пользователя #"+
 				logger.BLUE+strconv.Itoa(int(user.UserId))+logger.NO_COLOR+" успешно отправлено")
 		}
 	}(user, repairToken, conf.ServerIp, conf.ServerPort)

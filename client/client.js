@@ -48,37 +48,6 @@ function AuthBasic() {
 	}
 }
 
-function AuthAlternate() {
-	let xhr = new XMLHttpRequest();
-	xhr.open("GET", "http://"+serverIP+":"+serverPort+"/api/auth/oauth42/alternate");
-	xhr.send()
-	document.getElementById("errorField").innerHTML = "";
-	document.getElementById("responseField").innerHTML = "В процессе";
-
-	xhr.onload = function () {
-		console.log("rx: " + xhr.status + " : " + xhr.response);
-		if (xhr.status == 200) {
-			document.getElementById("errorField").innerHTML = ""
-			document.getElementById("responseField").innerHTML = xhr.status + " : " + xhr.response;
-		} else {
-			document.getElementById("errorField").innerHTML = "Что-то пошло не так: " + xhr.status + " : " + xhr.response;
-			document.getElementById("responseField").innerHTML = "";
-		}
-	}
-	xhr.onerror = function () {
-		console.log("onError event")
-	}
-	// xhr.onprogress = function () {
-	// 	document.getElementById("errorField").innerHTML = "";
-	// 	document.getElementById("responseField").innerHTML = "В процессе";
-	// }
-
-	// xhr.onreadystatechange = function () {
-	// 	document.getElementById("errorField").innerHTML = "";
-	// 	document.getElementById("responseField").innerHTML = "onreadystatechange";
-	// }
-}
-
 function ProfileCreate() {
 	var email = document.forms['profileCreate']['email'].value
 	var pass = document.forms['profileCreate']['passwd'].value
@@ -138,7 +107,7 @@ function ProfilePatch() {
 	var request = JSON.stringify(user)
 	let xhr = new XMLHttpRequest();
 	xhr.open("PATCH", "http://"+serverIP+":"+serverPort+"/api/profile/patch");
-	xhr.setRequestHeader("access_token", document.token)
+	xhr.setRequestHeader("accessToken", document.token)
 	console.log("tx: " + request)
 	xhr.send(request);
 	xhr.onload = function () {
