@@ -50,8 +50,10 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		id = uint(idInt)
+		logger.Log(r, "Пользователь #"+strconv.Itoa(int(header.UserId))+" ищет профиль пользователя #"+idString)
 	} else {
 		id = header.UserId
+		logger.Log(r, "Пользователь #"+strconv.Itoa(int(header.UserId))+" ищет свой профиль")
 	}
 
 	user, Err := postgres.UserGetBasicById(id)
@@ -76,5 +78,5 @@ func profileGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	successResponse(w, jsonUser)
-	logger.Success(r, "user #"+strconv.Itoa(int(user.UserId))+" was checked")
+	logger.Success(r, "Profile of user #"+strconv.Itoa(int(user.UserId))+" provided")
 }

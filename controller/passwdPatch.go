@@ -53,18 +53,22 @@ func passwdPatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encryptedPass, Err := hash.PasswdHash(passwd)
-	if Err != nil {
-		logger.Error(r, Err)
-		errorResponse(w, Err)
-		return
-	}
-
-	if user.EncryptedPass == nil || *encryptedPass != *user.EncryptedPass {
-		logger.Warning(r, "Хэши паролей не совпали. Ожидалось "+logger.BLUE+*user.EncryptedPass+logger.NO_COLOR+
-			" получили "+logger.BLUE+*encryptedPass+logger.NO_COLOR)
-		errorResponse(w, errors.ImpossibleToExecute.SetArgs("Пароль неверен", "Incorrect password"))
-		return
+	if user.EncryptedPass == nil {
+		logger.Log(r, "У пользователя #"+strconv.Itoa(int(header.UserId))+
+			" не задан пароль, поэтому не делаю проверку на совпадение старого пароля")
+	} else {
+		if encryptedPass, Err := hash.PasswdHash(passwd); Err != nil {
+			logger.Error(r, Err)
+			errorResponse(w, Err)
+			return
+		} else if *encryptedPass != *user.EncryptedPass {
+			logger.Warning(r, "Хэши паролей не совпали. Ожидалось "+logger.BLUE+*user.EncryptedPass+logger.NO_COLOR+
+				" получили "+logger.BLUE+*encryptedPass+logger.NO_COLOR)
+			errorResponse(w, errors.ImpossibleToExecute.SetArgs("Пароль неверен", "Incorrect password"))
+			return
+		} else {
+			logger.Log(r, "Хэши паролей совпали. Продолжаю выполнение")
+		}
 	}
 
 	user.EncryptedPass, Err = hash.PasswdHash(newPasswd)

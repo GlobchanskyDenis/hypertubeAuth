@@ -26,7 +26,8 @@ func TestAuthBasic(t *testing.T) {
 	}
 
 	var user = &model.UserBasic{}
-	user.Email = "test@gmail.com"
+	email := "test@gmail.com"
+	user.Email = &email
 	user.Passwd = "qweRTY123@"
 	user.EncryptedPass, Err = hash.PasswdHash(user.Passwd)
 	if Err != nil {
@@ -67,12 +68,12 @@ func TestAuthBasic(t *testing.T) {
 			expectedStatus: errors.AuthFail.GetHttpStatus(),
 		}, {
 			name:           "wrong passwd",
-			email:          user.Email,
+			email:          *user.Email,
 			passwd:         "passwd",
 			expectedStatus: errors.AuthFail.GetHttpStatus(),
 		}, {
 			name:           "valid",
-			email:          user.Email,
+			email:          *user.Email,
 			passwd:         user.Passwd,
 			expectedStatus: http.StatusOK,
 		},

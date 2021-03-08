@@ -31,7 +31,8 @@ func TestAuthCheck(t *testing.T) {
 	**	Создаем тестового юзера от имени которого будет запрашивать данные
 	 */
 	var user = &model.UserBasic{}
-	user.Email = "test@gmail.com"
+	email := "test@gmail.com"
+	user.Email = &email
 	user.Passwd = "qweRTY123@"
 	user.EncryptedPass, Err = hash.PasswdHash(user.Passwd)
 	if Err != nil {

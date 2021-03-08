@@ -30,7 +30,8 @@ func TestProfileGet(t *testing.T) {
 	**	Создаем тестового юзера от имени которого будет запрашивать данные
 	 */
 	var user1 = &model.UserBasic{}
-	user1.Email = "test@gmail.com"
+	email := "test@gmail.com"
+	user1.Email = &email
 	user1.Passwd = "qweRTY123@"
 	user1.EncryptedPass, Err = hash.PasswdHash(user1.Passwd)
 	if Err != nil {
@@ -58,7 +59,8 @@ func TestProfileGet(t *testing.T) {
 	**	Создаем второго тестового юзера. Его поля мы будем запрашивать
 	 */
 	var user2 = &model.UserBasic{}
-	user2.Email = "testUser2@gmail.com"
+	email2 := "testUser2@gmail.com"
+	user2.Email = &email2
 	user2.Passwd = "qweRTY123@"
 	user2.EncryptedPass, Err = hash.PasswdHash(user2.Passwd)
 	if Err != nil {
@@ -92,7 +94,7 @@ func TestProfileGet(t *testing.T) {
 	testCases := []struct {
 		name             string
 		userId           uint
-		expectedEmail    string
+		expectedEmail    *string
 		expectedUsername string
 		expectedStatus   int
 		token            string
@@ -100,14 +102,14 @@ func TestProfileGet(t *testing.T) {
 		{
 			name:             "invalid id (no such user)",
 			userId:           user2.UserId * 2,
-			expectedEmail:    "nil",
+			expectedEmail:    nil,
 			expectedUsername: "nil",
 			expectedStatus:   errors.ImpossibleToExecute.GetHttpStatus(),
 			token:            token,
 		}, {
 			name:             "valid profile of user #2",
 			userId:           user2.UserId,
-			expectedEmail:    "",
+			expectedEmail:    nil,
 			expectedUsername: user2.Username,
 			expectedStatus:   http.StatusOK,
 			token:            token,
@@ -121,7 +123,7 @@ func TestProfileGet(t *testing.T) {
 		}, {
 			name:             "invalid - no token in header",
 			userId:           0,
-			expectedEmail:    "nil",
+			expectedEmail:    nil,
 			expectedUsername: "nil",
 			expectedStatus:   errors.InvalidToken.GetHttpStatus(),
 			token:            "",
@@ -161,9 +163,13 @@ func TestProfileGet(t *testing.T) {
 					t_.Errorf("%sERROR: decoding response body error: %s%s", logger.RED_BG, err.Error(), logger.NO_COLOR)
 					t_.FailNow()
 				}
-				if responseUser.Email != tc.expectedEmail {
+				if tc.expectedEmail != nil && responseUser.Email == nil {
+					t_.Errorf("%sERROR: response user email is nil. Expected not nil%s", logger.RED_BG, logger.NO_COLOR)
+				} else if tc.expectedEmail == nil && responseUser.Email != nil {
+					t_.Errorf("%sERROR: response user email is '%s'. Expected nil%s", logger.RED_BG, *responseUser.Email, logger.NO_COLOR)
+				} else if tc.expectedEmail != nil && responseUser.Email != nil && *responseUser.Email != *tc.expectedEmail {
 					t_.Errorf("%sERROR: response user email differs. Expected %s got %s%s", logger.RED_BG,
-						tc.expectedEmail, responseUser.Email, logger.NO_COLOR)
+						*tc.expectedEmail, *responseUser.Email, logger.NO_COLOR)
 				}
 				if responseUser.Username != tc.expectedUsername {
 					t_.Errorf("%sERROR: response username differs. Expected %s got %s%s", logger.RED_BG,
